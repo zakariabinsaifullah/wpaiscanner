@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Getting started with AIScanner: scan, fix, verify — AIScanner Blog</title>
+<meta name="description" content="Install AIScanner, run your first scan, apply a reversible fix, and re-scan to prove the score moved — a five-minute walkthrough of the scan → fix → verify loop." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A1315'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%230FB5A1' stroke-width='2.4'/%3E%3Cpath d='M16 16 L23 9' stroke='%23F1A73A' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%230FB5A1'/%3E%3C/svg%3E" />
+
+<!-- ===================== SEO ===================== -->
+<link rel="canonical" href="https://wpaiscanner.com/blog/getting-started-with-aiscanner.html" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="theme-color" content="#0A1315" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#F1F4F2" media="(prefers-color-scheme: light)" />
+<meta name="author" content="AIScanner" />
+<link rel="sitemap" type="application/xml" href="https://wpaiscanner.com/sitemap.xml" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="AIScanner" />
+<meta property="og:title" content="Getting started with AIScanner: scan, fix, verify" />
+<meta property="og:description" content="Install AIScanner, run your first scan, apply a reversible fix, and re-scan to prove the score moved — a five-minute walkthrough." />
+<meta property="og:url" content="https://wpaiscanner.com/blog/getting-started-with-aiscanner.html" />
+<meta property="og:image" content="https://wpaiscanner.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:published_time" content="2026-07-31" />
+<meta property="article:section" content="Guide" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Getting started with AIScanner: scan, fix, verify" />
+<meta name="twitter:description" content="A five-minute walkthrough of the scan → fix → verify loop." />
+<meta name="twitter:image" content="https://wpaiscanner.com/og-image.png" />
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://wpaiscanner.com/blog/getting-started-with-aiscanner.html#post",
+      "headline": "Getting started with AIScanner: scan, fix, verify",
+      "description": "Install AIScanner, run your first scan, apply a reversible fix, and re-scan to prove the score moved.",
+      "url": "https://wpaiscanner.com/blog/getting-started-with-aiscanner.html",
+      "datePublished": "2026-07-31",
+      "dateModified": "2026-07-31",
+      "inLanguage": "en",
+      "image": "https://wpaiscanner.com/og-image.png",
+      "author": { "@type": "Organization", "name": "AIScanner", "url": "https://wpaiscanner.com/" },
+      "publisher": { "@type": "Organization", "name": "AIScanner", "url": "https://wpaiscanner.com/" },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://wpaiscanner.com/blog/getting-started-with-aiscanner.html" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://wpaiscanner.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://wpaiscanner.com/blog/" },
+        { "@type": "ListItem", "position": 3, "name": "Getting started with AIScanner", "item": "https://wpaiscanner.com/blog/getting-started-with-aiscanner.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="blog.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="../index.html" aria-label="AIScanner home">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="var(--ink)"/>
+        <circle cx="16" cy="16" r="9" fill="none" stroke="var(--signal)" stroke-width="2.4"/>
+        <path d="M16 16 L23 9" stroke="var(--beacon)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="2.2" fill="var(--signal)"/>
+      </svg>
+      <span>AI<b>Scanner</b></span>
+    </a>
+    <nav class="nav-links">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#grades">What it grades</a>
+      <a href="../docs.html">Docs</a>
+      <a href="index.html" class="active">Blog</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme" aria-label="Toggle color theme" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn btn-primary" href="../index.html#get">Get the plugin</a>
+    </div>
+  </div>
+</header>
+
+<div class="post-shell wrap">
+  <article class="post">
+    <span class="tag">Guide</span>
+    <h1>Getting started with AIScanner: scan, fix, verify</h1>
+    <div class="post-meta">
+      <time datetime="2026-07-31">July 31, 2026</time>
+      <span>·</span><span>5 min read</span>
+      <span>·</span><span>By the AIScanner team</span>
+    </div>
+
+    <p>AI agents and crawlers are already reading the web on behalf of real users — summarizing pages, comparing products, and answering questions without anyone clicking through. The question is no longer <em>whether</em> a machine visits your WordPress site, but whether it can make sense of what it finds. AIScanner measures exactly that, then helps you fix the gaps.</p>
+
+    <p>This walkthrough takes you through the full loop — <strong>scan → fix → verify</strong> — in about five minutes. If you haven't installed the plugin yet, grab it first.</p>
+
+    <div class="callout">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>
+      <p>Download the latest build from the homepage, then install it via <strong>Plugins → Add New → Upload Plugin</strong>. Full steps live in the <a class="inl" href="../docs.html#install">documentation</a>.</p>
+    </div>
+
+    <h2>1. Run your first scan</h2>
+    <p>Open <strong>AIScanner</strong> in the WordPress admin sidebar and click <strong>Scan</strong>. The plugin fetches your own pages over real HTTP — the same way an external agent would — and grades them against a fixed rubric across five dimensions.</p>
+    <p>You'll get a score out of 100 and a level, plus a per-check breakdown showing exactly which signals passed, which failed, and which couldn't be verified. Nothing is guessed: a check the plugin can't confirm is reported as informational rather than a misleading pass or fail.</p>
+
+    <h2>2. Read the rubric</h2>
+    <p>Each dimension groups a handful of concrete checks — things like a discoverable sitemap, machine-readable metadata, and clean structured data. The point isn't to chase a perfect score; it's to see where a machine reader stumbles today.</p>
+    <blockquote>A good score means an agent can find your content, understand what each page is about, and act on it without guessing.</blockquote>
+    <p>Skim the failing checks first. Most sites lose easy points on a couple of high-value signals, and those are the ones worth fixing immediately.</p>
+
+    <h2>3. Apply a reversible fix</h2>
+    <p>This is what sets AIScanner apart from a stateless checker: it doesn't just report problems, it fixes them — safely. Every fix writes plugin settings and <strong>nothing else</strong>. No theme files are edited and no posts are rewritten, so turning a fix off restores the exact prior behavior.</p>
+    <p>Pick a failing check, click <strong>Fix</strong>, and confirm. Because the change lives entirely in settings, it's genuinely reversible at any time.</p>
+
+    <div class="callout">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg>
+      <p>Already run an SEO plugin like Yoast or Rank Math? AIScanner detects it and defers per feature, so you never end up with two sitemaps or two sets of metadata.</p>
+    </div>
+
+    <h2>4. Verify the change</h2>
+    <p>Click <strong>Scan</strong> again. The check you fixed should now pass and your score should move up. That re-scan is the whole point — it proves the change worked against your live site instead of asking you to take it on faith.</p>
+    <p>Repeat the loop a few times and you'll have walked your site from wherever it started to a level where agents can reliably read and act on it.</p>
+
+    <h2>Where to go next</h2>
+    <ul>
+      <li><strong>Automate it.</strong> AIScanner ships an optional MCP server so an AI agent can call <code>scan</code>, <code>fix</code>, <code>verify</code>, and <code>revert</code> directly. See the <a class="inl" href="../docs.html#mcp">MCP guide</a>.</li>
+      <li><strong>Understand the scoring.</strong> The <a class="inl" href="../docs.html#rubric">rubric reference</a> lists every dimension and check.</li>
+      <li><strong>Stay private.</strong> AIScanner talks only to your own site, sends nothing to third parties, and has no telemetry.</li>
+    </ul>
+
+    <p>That's the loop. Scan to see where you stand, fix what a machine can't read, and verify that the score actually moved.</p>
+  </article>
+
+  <div class="post-foot">
+    <a href="index.html">← All posts</a>
+    <a href="../index.html#get">Download the plugin →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© 2026 GutenbergKits · AIScanner v0.1.0 · GPL-2.0-or-later</span>
+    <span><a href="../index.html">← Back to overview</a> &nbsp;·&nbsp; <a href="https://gutenbergkits.com" target="_blank" rel="noopener">GutenbergKits</a></span>
+  </div>
+</footer>
+
+<script src="blog.js"></script>
+</body>
+</html>
