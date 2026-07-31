@@ -6,6 +6,86 @@
 <title>AIScanner — Documentation</title>
 <meta name="description" content="Documentation for AIScanner: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A1315'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%230FB5A1' stroke-width='2.4'/%3E%3Cpath d='M16 16 L23 9' stroke='%23F1A73A' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%230FB5A1'/%3E%3C/svg%3E" />
+
+<!-- ===================== SEO ===================== -->
+<link rel="canonical" href="https://wpaiscanner.com/docs.html" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="theme-color" content="#0A1315" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#F1F4F2" media="(prefers-color-scheme: light)" />
+<meta name="author" content="AIScanner" />
+<link rel="sitemap" type="application/xml" href="https://wpaiscanner.com/sitemap.xml" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="AIScanner" />
+<meta property="og:title" content="AIScanner Documentation — install, rubric, fixes &amp; MCP server" />
+<meta property="og:description" content="Documentation for AIScanner: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ." />
+<meta property="og:url" content="https://wpaiscanner.com/docs.html" />
+<meta property="og:image" content="https://wpaiscanner.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="AIScanner — score your WordPress site for AI and agent readiness" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AIScanner Documentation" />
+<meta name="twitter:description" content="Installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ." />
+<meta name="twitter:image" content="https://wpaiscanner.com/og-image.png" />
+<meta name="twitter:image:alt" content="AIScanner — score your WordPress site for AI and agent readiness" />
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://wpaiscanner.com/docs.html#article",
+      "headline": "AIScanner Documentation",
+      "description": "Documentation for AIScanner: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ.",
+      "url": "https://wpaiscanner.com/docs.html",
+      "inLanguage": "en",
+      "image": "https://wpaiscanner.com/og-image.png",
+      "author": { "@type": "Organization", "name": "AIScanner" },
+      "publisher": { "@type": "Organization", "name": "AIScanner" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://wpaiscanner.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://wpaiscanner.com/docs.html" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does it conflict with Yoast, Rank Math, or AIOSEO?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. AIScanner detects them and defers per feature, so you don't get two sitemaps, two meta descriptions, or two JSON-LD graphs." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does a check say “couldn't verify”?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Some hosts block a site from making HTTP requests to itself. When that happens AIScanner reports an informational result rather than guessing, so a blocked loopback never becomes a misleading pass or fail." }
+        },
+        {
+          "@type": "Question",
+          "name": "I enabled static export and nothing happened.",
+          "acceptedAnswer": { "@type": "Answer", "text": "Static export refuses to overwrite a robots.txt or llms.txt it did not create, so a hand-maintained file is never clobbered. Remove or rename the existing file if you want the plugin to manage it." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens when I uninstall?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Uninstalling removes the custom table, all options and transients, the scheduled re-scan, and any files the plugin exported." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
 <style>
 :root{
   --ink:#0A1315;--porcelain:#F1F4F2;--paper:#FBFCFB;--line:#e0e6e3;--slate:#54635f;--slate-2:#71827d;
