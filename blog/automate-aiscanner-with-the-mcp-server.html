@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Automate AIScanner with the MCP server — AIScanner Blog</title>
+<meta name="description" content="AIScanner ships an optional MCP server that exposes scan, fix, verify, and revert as tools an AI agent can call directly. Here's how to enable it safely." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A1315'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%230FB5A1' stroke-width='2.4'/%3E%3Cpath d='M16 16 L23 9' stroke='%23F1A73A' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%230FB5A1'/%3E%3C/svg%3E" />
+
+<!-- ===================== SEO ===================== -->
+<link rel="canonical" href="https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="theme-color" content="#0A1315" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#F1F4F2" media="(prefers-color-scheme: light)" />
+<meta name="author" content="AIScanner" />
+<link rel="sitemap" type="application/xml" href="https://wpaiscanner.com/sitemap.xml" />
+
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="AIScanner" />
+<meta property="og:title" content="Automate AIScanner with the MCP server" />
+<meta property="og:description" content="Expose scan, fix, verify, and revert as tools an AI agent can call directly — enabled with a bearer token you generate yourself." />
+<meta property="og:url" content="https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html" />
+<meta property="og:image" content="https://wpaiscanner.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:published_time" content="2026-07-31" />
+<meta property="article:section" content="Guide" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Automate AIScanner with the MCP server" />
+<meta name="twitter:description" content="Let an AI agent run the scan → fix → verify loop on your WordPress site." />
+<meta name="twitter:image" content="https://wpaiscanner.com/og-image.png" />
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html#post",
+      "headline": "Automate AIScanner with the MCP server",
+      "description": "AIScanner ships an optional MCP server that exposes scan, fix, verify, and revert as tools an AI agent can call directly. Here's how to enable it safely.",
+      "url": "https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html",
+      "datePublished": "2026-07-31",
+      "dateModified": "2026-07-31",
+      "inLanguage": "en",
+      "image": "https://wpaiscanner.com/og-image.png",
+      "author": { "@type": "Organization", "name": "AIScanner", "url": "https://wpaiscanner.com/" },
+      "publisher": { "@type": "Organization", "name": "AIScanner", "url": "https://wpaiscanner.com/" },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://wpaiscanner.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://wpaiscanner.com/blog/" },
+        { "@type": "ListItem", "position": 3, "name": "Automate AIScanner with the MCP server", "item": "https://wpaiscanner.com/blog/automate-aiscanner-with-the-mcp-server.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="blog.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="../index.html" aria-label="AIScanner home">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="var(--ink)"/>
+        <circle cx="16" cy="16" r="9" fill="none" stroke="var(--signal)" stroke-width="2.4"/>
+        <path d="M16 16 L23 9" stroke="var(--beacon)" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="2.2" fill="var(--signal)"/>
+      </svg>
+      <span>AI<b>Scanner</b></span>
+    </a>
+    <nav class="nav-links">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#grades">What it grades</a>
+      <a href="../docs.html">Docs</a>
+      <a href="index.html" class="active">Blog</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme" aria-label="Toggle color theme" title="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn btn-primary" href="../index.html#get">Get the plugin</a>
+    </div>
+  </div>
+</header>
+
+<div class="post-shell wrap">
+  <article class="post">
+    <span class="tag">Guide</span>
+    <h1>Automate AIScanner with the MCP server</h1>
+    <div class="post-meta">
+      <time datetime="2026-07-31">July 31, 2026</time>
+      <span>·</span><span>6 min read</span>
+      <span>·</span><span>By the AIScanner team</span>
+    </div>
+
+    <p>Running the scan → fix → verify loop by hand is fine for one site. But if you manage a dozen — or you'd rather have an AI assistant handle readiness the same way it handles the rest of your workflow — AIScanner can hand the whole loop to an agent. It ships an optional <strong>MCP server</strong> that exposes its core actions as tools an AI agent can call directly.</p>
+
+    <blockquote>MCP (the Model Context Protocol) is a standard way for AI agents to call external tools. AIScanner's server turns "scan, fix, verify" from clicks in the dashboard into functions your agent can invoke.</blockquote>
+
+    <h2>What the agent can do</h2>
+    <p>The server exposes four tools, mirroring exactly what you'd do in the dashboard:</p>
+    <ul>
+      <li><strong><code>scan</code></strong> — fetch your pages over real HTTP and score them against the rubric.</li>
+      <li><strong><code>fix</code></strong> — apply a reversible, settings-only fix for a failing check.</li>
+      <li><strong><code>verify</code></strong> — re-scan to confirm the change moved the score.</li>
+      <li><strong><code>revert</code></strong> — undo a fix and restore the exact prior behavior.</li>
+    </ul>
+    <p>Because these are the same operations the plugin performs internally, an agent driving them gets identical, non-destructive results — nothing about the loop changes just because a machine is calling it.</p>
+
+    <h2>It's off by default, and gated by a token</h2>
+    <p>The MCP server does nothing until you turn it on, and it will not answer a single request without a bearer token that <strong>you</strong> generate. This is deliberate: an endpoint that can change your site's settings should never be open by default.</p>
+    <ol class="steps-list">
+      <li>Go to <strong>AIScanner → Settings</strong>, tick <strong>Enable the MCP server</strong>, and click <strong>Save Changes</strong>.</li>
+      <li>Copy the bearer token shown. It is stored hashed and cannot be displayed again — regenerate it if you lose it.</li>
+      <li>Register it with your agent.</li>
+    </ol>
+
+    <p>Registering with a Claude-based agent looks like this:</p>
+<pre><span class="c"># Register AIScanner with your agent</span>
+<span class="p">$</span> claude mcp add <span class="a">--transport</span> http aiscanner \
+    https://your-site.com/wp-json/aiscaner/mcp \
+    <span class="a">--header</span> <span class="s">"Authorization: Bearer &lt;token&gt;"</span>
+
+<span class="ok">✓</span> connected · tools: scan  fix  verify  revert</pre>
+
+    <p>From here you can simply ask the agent to "scan the site, fix the two highest-value failing checks, and verify" — and it will call the tools in sequence, exactly as you would.</p>
+
+    <h2>The security model</h2>
+    <p>An endpoint that can modify settings deserves a careful security design, and AIScanner treats the token accordingly:</p>
+    <ul>
+      <li>The bearer token is stored as a <strong>SHA-256 hash</strong>. Its raw value is displayed exactly once, when generated, and cannot be recovered — regenerate it if lost.</li>
+      <li>The token is <strong>never included in a settings export</strong>, and a settings import can never set or enable it. You can't accidentally leak or import your way into an open endpoint.</li>
+      <li>Failed authentication attempts are <strong>rate-limited per IP</strong>, and cross-origin requests to the MCP endpoint are rejected.</li>
+      <li>All dashboard REST routes require <code>manage_options</code>; per-entity routes additionally require <code>edit_post</code> for that specific post.</li>
+    </ul>
+
+    <div class="callout">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <p>Lost or leaked the token? Regenerate it from <strong>AIScanner → Settings</strong>. The old value stops working immediately, since only its hash was ever stored.</p>
+    </div>
+
+    <h2>When automation earns its keep</h2>
+    <p>Manual scanning is perfect for a single site you touch often. The MCP server pays off when readiness needs to be continuous or hands-off — a portfolio of client sites, a scheduled check an agent runs after each deploy, or simply folding "is my site still agent-readable?" into an assistant you already talk to every day.</p>
+    <p>The safety guarantees don't change either way. Every fix an agent applies is still settings-only and still reversible, so handing over the keys never means handing over the ability to break your theme or rewrite your content.</p>
+  </article>
+
+  <div class="post-foot">
+    <a href="index.html">← All posts</a>
+    <a href="../docs.html#mcp">Read the MCP docs →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© 2026 GutenbergKits · AIScanner v0.1.0 · GPL-2.0-or-later</span>
+    <span><a href="../index.html">← Back to overview</a> &nbsp;·&nbsp; <a href="https://gutenbergkits.com" target="_blank" rel="noopener">GutenbergKits</a></span>
+  </div>
+</footer>
+
+<script src="blog.js"></script>
+</body>
+</html>
