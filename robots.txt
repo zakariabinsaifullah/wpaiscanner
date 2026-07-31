@@ -1,0 +1,6 @@
+# AIScanner — https://wpaiscanner.com/
+# All crawlers (search engines and AI agents) are welcome to index the full site.
+User-agent: *
+Allow: /
+
+Sitemap: https://wpaiscanner.com/sitemap.xml
