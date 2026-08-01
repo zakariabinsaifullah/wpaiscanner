@@ -1,0 +1,51 @@
+name: Track plugin downloads
+
+# GitHub counts every release-asset download but only exposes the *current*
+# total — it keeps no history and fires no event per download. This job
+# snapshots the count once a day and commits it, building a time series.
+
+on:
+  schedule:
+    - cron: '17 3 * * *' # daily at 03:17 UTC
+  workflow_dispatch: # manual run from the Actions tab
+
+concurrency:
+  group: track-downloads
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    name: Snapshot download counts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Read download counts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSET_PATTERN: .zip
+        run: node .github/scripts/track-downloads.mjs
+
+      - name: Commit the snapshot
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Nothing to do when the total hasn't moved since the last run.
+          if git diff --quiet -- data; then
+            echo "Download total unchanged — nothing to commit."
+            exit 0
+          fi
+
+          git add data
+          git commit -m "chore(data): download snapshot for $(date -u +%Y-%m-%d)"
+          git push
