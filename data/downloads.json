@@ -1,16 +1,16 @@
 {
   "repo": "zakariabinsaifullah/wpaiscanner",
-  "checked_on": "2026-08-12",
-  "total": 25,
+  "checked_on": "2026-08-13",
+  "total": 26,
   "releases": [
     {
       "tag": "0.1.0",
       "published_at": "2026-07-30T12:02:36Z",
-      "downloads": 25,
+      "downloads": 26,
       "assets": [
         {
           "name": "aiscaner.zip",
-          "downloads": 25
+          "downloads": 26
         }
       ]
     }
