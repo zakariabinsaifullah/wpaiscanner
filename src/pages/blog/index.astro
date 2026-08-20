@@ -1,0 +1,184 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const SITE = Astro.site.href.replace(/\/$/, '');
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const fmt = (d) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Blog',
+      '@id': `${SITE}/blog/#blog`,
+      url: `${SITE}/blog/`,
+      name: 'Crawlwise Blog',
+      description: 'Notes on making WordPress sites readable to AI agents.',
+      inLanguage: 'en',
+      publisher: { '@type': 'Organization', name: 'Crawlwise', url: `${SITE}/` },
+      blogPost: posts.map((p) => ({
+        '@type': 'BlogPosting',
+        headline: p.data.title,
+        url: `${SITE}/blog/${p.id}/`,
+        datePublished: p.data.pubDate.toISOString().slice(0, 10),
+        author: { '@type': 'Organization', name: 'Crawlwise' },
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
+      ],
+    },
+  ],
+};
+---
+
+<Base
+  title="Blog — Crawlwise"
+  description="Field notes on making WordPress sites readable to AI agents — the rubric, reversible fixes, MCP, and the machine-readable web."
+  jsonLd={jsonLd}
+>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Blog</span>
+        <span class="rule"></span>
+      </div>
+      <h1 class="h-section">Field notes from the machine-readable web.</h1>
+      <p class="lead measure">
+        Notes on making WordPress sites readable to AI agents — the rubric, reversible fixes, the
+        MCP server, and what changes when your readers aren’t all human.
+      </p>
+    </div>
+  </section>
+
+  <section class="posts">
+    <div class="wrap">
+      <div class="grid">
+        {
+          posts.map((p) => (
+            <a class="card" href={`/blog/${p.id}/`}>
+              <span class="tag">{p.data.category}</span>
+              <h2 class="card-title">{p.data.title}</h2>
+              <p class="card-desc">{p.data.description}</p>
+              <span class="card-meta mono">
+                <time datetime={p.data.pubDate.toISOString()}>{fmt(p.data.pubDate)}</time>
+                <span>·</span>
+                <span>{p.data.readingTime}</span>
+              </span>
+              <span class="more">
+                Read post
+                <Icon name="arrow-right" size={13} color="#8F5400" />
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head {
+    padding-block: 72px 44px;
+  }
+
+  .page-head .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .measure {
+    max-width: 660px;
+  }
+
+  .posts {
+    padding-bottom: 100px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--border);
+    padding: 24px;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .card:hover {
+    box-shadow: inset 0 0 0 1px var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+
+  .card-title {
+    margin-top: 16px;
+    font-size: 21px;
+    line-height: 1.25;
+    letter-spacing: -0.4px;
+  }
+
+  .card-desc {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--body);
+  }
+
+  .card-meta {
+    margin-top: 18px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .more {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  @media (max-width: 860px) {
+    .page-head {
+      padding-block: 48px 32px;
+    }
+
+    .posts {
+      padding-bottom: 68px;
+    }
+  }
+</style>

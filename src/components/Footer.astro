@@ -1,0 +1,171 @@
+---
+import Icon from './Icon.astro';
+
+const columns = [
+  {
+    heading: 'Product',
+    links: [
+      { label: 'How it works', href: '/#how-it-works' },
+      { label: 'What it grades', href: '/#the-rubric' },
+      { label: 'Scoring levels', href: '/#scoring' },
+      { label: 'Agent API', href: '/#agent-api' },
+    ],
+  },
+  {
+    heading: 'Docs',
+    links: [
+      { label: 'Installation', href: '/docs/#install' },
+      { label: 'The rubric', href: '/docs/#rubric' },
+      { label: 'MCP server', href: '/docs/#mcp' },
+      { label: 'FAQ', href: '/docs/#faq' },
+    ],
+  },
+  {
+    heading: 'Company',
+    links: [
+      { label: 'GutenbergKits', href: 'https://gutenbergkits.com' },
+      { label: 'Blog', href: '/blog/' },
+      { label: 'Privacy', href: '/docs/#privacy' },
+      { label: 'Security', href: '/docs/#security' },
+    ],
+  },
+];
+---
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="columns">
+      <div class="brand-col">
+        <div class="lockup">
+          <span class="mark"><Icon name="radar" size={13} color="#8F5400" /></span>
+          <span class="wordmark">Crawlwise</span>
+        </div>
+        <p class="desc">
+          The readiness dashboard for the machine-readable web. Scan, fix, and verify your
+          WordPress site for AI agents.
+        </p>
+      </div>
+
+      {
+        columns.map((col) => (
+          <div class="col">
+            <h3 class="mono heading">{col.heading}</h3>
+            {col.links.map((l) => (
+              <a href={l.href}>{l.label}</a>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="bottom">
+      <span class="mono">© 2026 GutenbergKits · Crawlwise v0.1.0</span>
+      <span class="mono">Built for WordPress · GPL-2.0-or-later</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding-block: 64px 34px;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 52px;
+  }
+
+  .columns {
+    display: flex;
+    gap: 80px;
+  }
+
+  .brand-col {
+    width: 340px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+
+  .desc {
+    font-size: 13px;
+    line-height: 21px;
+    color: var(--body);
+  }
+
+  .col {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .heading {
+    font-weight: 400;
+  }
+
+  .col a {
+    font-size: 13.5px;
+    color: var(--body);
+    transition: color 0.15s ease;
+  }
+
+  .col a:hover {
+    color: var(--accent);
+  }
+
+  .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    .columns {
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+
+    .brand-col {
+      width: 100%;
+    }
+
+    .col {
+      flex: 1 1 160px;
+    }
+  }
+</style>

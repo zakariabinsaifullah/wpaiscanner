@@ -1,0 +1,257 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const fmt = (d) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const SITE = Astro.site.href.replace(/\/$/, '');
+const url = `${SITE}/blog/${post.id}/`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      '@id': `${url}#post`,
+      headline: post.data.title,
+      description: post.data.description,
+      url,
+      datePublished: post.data.pubDate.toISOString().slice(0, 10),
+      dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString().slice(0, 10),
+      inLanguage: 'en',
+      image: `${SITE}/og-image.png`,
+      author: { '@type': 'Organization', name: 'Crawlwise', url: `${SITE}/` },
+      publisher: { '@type': 'Organization', name: 'Crawlwise', url: `${SITE}/` },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
+        { '@type': 'ListItem', position: 3, name: post.data.title, item: url },
+      ],
+    },
+  ],
+};
+---
+
+<Base
+  title={`${post.data.title} — Crawlwise Blog`}
+  description={post.data.description}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <article class="post">
+    <div class="wrap post-head">
+      <a class="back mono" href="/blog/">← All posts</a>
+      <span class="tag">{post.data.category}</span>
+      <h1 class="post-title">{post.data.title}</h1>
+      <div class="post-meta mono">
+        <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+        <span>·</span><span>{post.data.readingTime}</span>
+        <span>·</span><span>By the Crawlwise team</span>
+      </div>
+    </div>
+
+    <div class="wrap prose">
+      <Content />
+    </div>
+
+    <div class="wrap post-foot">
+      <a href="/blog/">← All posts</a>
+      <a class="dl" href="/#get">
+        Download the plugin
+        <Icon name="arrow-right" size={13} color="#8F5400" />
+      </a>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post {
+    padding-block: 56px 100px;
+  }
+
+  .post-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    max-width: 760px;
+  }
+
+  .back {
+    color: var(--muted);
+    margin-bottom: 26px;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+
+  .post-title {
+    margin-top: 16px;
+    font-size: clamp(30px, 3.6vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .post-meta {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+  }
+
+  .prose {
+    max-width: 760px;
+  }
+
+  .post-foot {
+    max-width: 760px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .post-foot a {
+    color: var(--accent);
+  }
+
+  .dl {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  /* markdown output */
+  .prose :global(h2) {
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    margin-top: 44px;
+  }
+
+  .prose :global(h3) {
+    font-size: 19px;
+    letter-spacing: -0.3px;
+    margin-top: 30px;
+  }
+
+  .prose :global(p) {
+    margin-top: 18px;
+    font-size: 16px;
+    line-height: 27px;
+    color: var(--body);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-top: 18px;
+    padding-left: 22px;
+    color: var(--body);
+  }
+
+  .prose :global(ul) {
+    list-style: disc;
+  }
+
+  .prose :global(ol) {
+    list-style: decimal;
+  }
+
+  .prose :global(li) {
+    margin-top: 9px;
+    font-size: 16px;
+    line-height: 27px;
+  }
+
+  .prose :global(strong) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose :global(blockquote) {
+    margin: 26px 0;
+    padding: 16px 20px;
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .prose :global(blockquote p) {
+    margin: 0;
+    font-size: 15px;
+    line-height: 25px;
+  }
+
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.1em 0.4em;
+  }
+
+  .prose :global(pre) {
+    margin-top: 22px;
+    padding: 20px;
+    background: var(--surface-3);
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 20px;
+  }
+
+  .prose :global(pre code) {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  @media (max-width: 860px) {
+    .post {
+      padding-block: 40px 68px;
+    }
+  }
+</style>

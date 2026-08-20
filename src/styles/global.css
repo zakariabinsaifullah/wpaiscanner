@@ -1,0 +1,289 @@
+/* ============================================================
+   Crawlwise — design system
+   Tokens transcribed directly from the Crawlwise design file.
+   ============================================================ */
+
+:root {
+  /* surfaces */
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f1efeb;
+  --surface-3: #efede8;
+  --border: #e4e1db;
+  --border-strong: #c6c2b9;
+
+  /* text */
+  --ink: #14161a;
+  --body: #585e66;
+  --muted: #71777e;
+
+  /* brand */
+  --accent: #8f5400;
+  --accent-ink: #fff8ec;
+  --accent-soft: #efdcae;
+
+  /* semantics */
+  --pass: #12855a;
+  --fail: #c33a26;
+  --info: #2160c4;
+
+  /* type */
+  --font-display: Archivo, system-ui, sans-serif;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* layout — 1160px content inside 140px gutters at 1440px */
+  --content: 1160px;
+  --gutter: 24px;
+  --radius: 10px;
+  --radius-sm: 7px;
+
+  /* section rhythm */
+  --section-pt: 100px;
+  --section-pb: 104px;
+  --section-gap: 52px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--body);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 26px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ---------- layout primitives ---------- */
+
+.wrap {
+  width: min(100% - (var(--gutter) * 2), var(--content));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section-pt) var(--section-pb);
+  border-top: 1px solid var(--border);
+}
+
+.section--white {
+  background: var(--surface);
+}
+
+.section-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+/* ---------- eyebrow ---------- */
+
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  color: var(--accent);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.rule {
+  flex: 1 1 0;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ---------- type ---------- */
+
+.h-section {
+  font-size: clamp(30px, 3.1vw, 44px);
+  line-height: 1.09;
+  letter-spacing: -1px;
+}
+
+.h-split {
+  font-size: clamp(28px, 2.85vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.lead {
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--body);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 13px 22px;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--primary:hover {
+  background: #7a4700;
+}
+
+.btn--secondary {
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.btn--secondary:hover {
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+}
+
+.btn--lg {
+  padding: 14px 26px;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+}
+
+.panel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 42px;
+  padding-inline: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pass);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- responsive rhythm ---------- */
+
+@media (max-width: 900px) {
+  :root {
+    --section-pt: 68px;
+    --section-pb: 72px;
+    --section-gap: 36px;
+  }
+}
+
+@media (max-width: 620px) {
+  /* Let the two-up panel headers stack instead of cramming onto one line. */
+  .panel-bar {
+    height: auto;
+    min-height: 42px;
+    padding-block: 9px;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+}

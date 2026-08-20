@@ -1,0 +1,135 @@
+---
+import Icon from './Icon.astro';
+
+const links = [
+  { label: 'How it works', href: '/#how-it-works' },
+  { label: 'The rubric', href: '/#the-rubric' },
+  { label: 'Scoring', href: '/#scoring' },
+  { label: 'Agent API', href: '/#agent-api' },
+  { label: 'Docs', href: '/docs/' },
+];
+---
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="nav-left">
+      <a class="brand" href="/" aria-label="Crawlwise home">
+        <span class="mark"><Icon name="radar" size={14} color="#8F5400" /></span>
+        <span class="wordmark">Crawlwise</span>
+      </a>
+      <nav class="links" aria-label="Primary">
+        {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+    </div>
+    <div class="actions">
+      <span class="version">v0.1.0</span>
+      <a class="btn btn--primary btn--sm" href="/#get">Get the plugin</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(150%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 68px;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    min-width: 0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: none;
+  }
+
+  .mark {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .links a {
+    font-size: 13.5px;
+    color: var(--body);
+    white-space: nowrap;
+    transition: color 0.15s ease;
+  }
+
+  .links a:hover {
+    color: var(--ink);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: none;
+  }
+
+  .version {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+  }
+
+  .btn--sm {
+    font-size: 13.5px;
+    padding: 9px 15px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 1080px) {
+    .links {
+      gap: 20px;
+    }
+
+    .nav-left {
+      gap: 26px;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .links,
+    .version {
+      display: none;
+    }
+  }
+</style>
