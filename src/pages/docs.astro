@@ -1,0 +1,712 @@
+---
+import Base from '../layouts/Base.astro';
+
+const SITE = Astro.site.href.replace(/\/$/, '');
+
+const toc = [
+  {
+    group: 'Getting started',
+    items: [
+      { id: 'install', label: 'Installation' },
+      { id: 'quickstart', label: 'Quick start' },
+    ],
+  },
+  {
+    group: 'Concepts',
+    items: [
+      { id: 'rubric', label: 'The rubric' },
+      { id: 'dimensions', label: 'Dimensions & checks' },
+      { id: 'fixes', label: 'Fixes & reversibility' },
+    ],
+  },
+  {
+    group: 'Advanced',
+    items: [
+      { id: 'mcp', label: 'Agent (MCP) server' },
+      { id: 'privacy', label: 'Privacy' },
+      { id: 'security', label: 'Security' },
+    ],
+  },
+  {
+    group: 'Reference',
+    items: [
+      { id: 'faq', label: 'FAQ' },
+      { id: 'changelog', label: 'Changelog' },
+    ],
+  },
+];
+
+const levels = [
+  ['5', 'Agent-Native', '90–100', 'Fully legible and actionable to agents.'],
+  ['4', 'Interactive', '70–89', 'Capabilities & APIs are discoverable.'],
+  ['3', 'Governed', '50–69', 'Explicit rules for which bots may do what.'],
+  ['2', 'Readable', '30–49', 'Content available in machine-friendly form.'],
+  ['1', 'Discoverable', '10–29', 'Basic robots & sitemap signals present.'],
+  ['0', 'Invisible', '0–9', 'Agents can’t reliably find or read the site.'],
+];
+
+const dimensions = [
+  {
+    name: 'Discoverability',
+    pts: '13 pts',
+    checks: [
+      ['D1', 'robots.txt present & sane', '6 pts · core'],
+      ['D2', 'XML sitemap', '4 pts · core'],
+      ['D3', 'Link header for discovery', '3 pts · core'],
+    ],
+  },
+  {
+    name: 'Content',
+    pts: '18 pts',
+    checks: [
+      ['C1', 'Markdown content negotiation', '8 pts · core'],
+      ['C2', '/llms.txt', '6 pts · core'],
+      ['C3', 'Structured HTML (headings, landmarks, FAQ, tables)', '4 pts · core'],
+    ],
+  },
+  {
+    name: 'Bot Access',
+    pts: '15 pts',
+    checks: [
+      ['B1', 'Content Signals in robots.txt', '5 pts · core'],
+      ['B2', 'Explicit AI bot rules', '5 pts · core'],
+      ['B3', 'Web Bot Auth key directory', '5 pts · advanced'],
+    ],
+  },
+  {
+    name: 'Capabilities',
+    pts: '12 pts',
+    checks: [
+      ['K1', 'API catalog', '3 pts · advanced'],
+      ['K2', 'MCP card', '3 pts · advanced'],
+      ['K3', 'Agent skills', '3 pts · advanced'],
+      ['K4', 'OAuth metadata', '3 pts · advanced'],
+    ],
+  },
+  {
+    name: 'Commerce',
+    pts: '10 pts · WooCommerce only',
+    checks: [
+      ['M1', 'UCP signals', '5 pts · advanced'],
+      ['M2', 'x402 signals', '5 pts · advanced'],
+    ],
+  },
+];
+
+const faqs = [
+  {
+    q: 'Does it conflict with Yoast, Rank Math, or AIOSEO?',
+    a: 'No. Crawlwise detects them and defers per feature, so you don’t get two sitemaps, two meta descriptions, or two JSON-LD graphs.',
+  },
+  {
+    q: 'Why does a check say “couldn’t verify”?',
+    a: 'Some hosts block a site from making HTTP requests to itself. When that happens Crawlwise reports an informational result rather than guessing, so a blocked loopback never becomes a misleading pass or fail.',
+  },
+  {
+    q: 'I enabled static export and nothing happened.',
+    a: 'Static export refuses to overwrite a robots.txt or llms.txt it did not create, so a hand-maintained file is never clobbered. Remove or rename the existing file if you want the plugin to manage it.',
+  },
+  {
+    q: 'What happens when I uninstall?',
+    a: 'Uninstalling removes the custom table, all options and transients, the scheduled re-scan, and any files the plugin exported.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'TechArticle',
+      '@id': `${SITE}/docs/#article`,
+      headline: 'Crawlwise Documentation',
+      description:
+        'Documentation for Crawlwise: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ.',
+      url: `${SITE}/docs/`,
+      inLanguage: 'en',
+      image: `${SITE}/og-image.png`,
+      author: { '@type': 'Organization', name: 'Crawlwise' },
+      publisher: { '@type': 'Organization', name: 'Crawlwise' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Documentation', item: `${SITE}/docs/` },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+};
+---
+
+<Base
+  title="Documentation — Crawlwise"
+  description="Documentation for Crawlwise: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ."
+  jsonLd={jsonLd}
+>
+  <section class="doc-head">
+    <div class="wrap">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Documentation · v0.1.0</span>
+        <span class="rule"></span>
+      </div>
+      <h1 class="h-section">Everything you need to run Crawlwise.</h1>
+      <p class="lead measure">
+        Install it, understand the rubric, apply reversible fixes, and — if you want — hand the
+        whole loop to an agent over MCP.
+      </p>
+    </div>
+  </section>
+
+  <div class="wrap doc-layout">
+    <aside class="toc" aria-label="On this page">
+      {
+        toc.map((g) => (
+          <div class="toc-group">
+            <h2 class="mono">{g.group}</h2>
+            {g.items.map((i) => (
+              <a href={`#${i.id}`}>{i.label}</a>
+            ))}
+          </div>
+        ))
+      }
+    </aside>
+
+    <article class="doc">
+      <section id="install">
+        <h2>Installation</h2>
+        <p>Crawlwise requires WordPress 6.7+ and PHP 7.4+.</p>
+        <ol class="steps">
+          <li>
+            Upload the <code>crawlwise</code> folder to <code>/wp-content/plugins/</code>, or install
+            it through <strong>Plugins → Add New</strong>.
+          </li>
+          <li>Activate the plugin through the Plugins screen.</li>
+          <li>
+            Open <strong>Crawlwise</strong> in the admin menu and click <strong>Scan</strong> to grade
+            your site.
+          </li>
+          <li>
+            Apply a fix from any failing check, then click <strong>Verify</strong> to confirm the
+            change over a real HTTP request.
+          </li>
+        </ol>
+        <div class="callout">
+          <p>
+            Activation creates one custom table (<code>&#123;prefix&#125;_crawlwise_scans</code>) for
+            score history and flushes rewrite rules so <code>/llms.txt</code>, <code>*.md</code>, and
+            <code>.well-known/*</code> routes can resolve.
+          </p>
+        </div>
+      </section>
+
+      <section id="quickstart">
+        <h2>Quick start</h2>
+        <p>The core workflow is a three-beat loop you can repeat any time your site changes:</p>
+        <ol class="steps">
+          <li>
+            <strong>Scan.</strong> Crawlwise fetches your live URLs and grades five dimensions against
+            the rubric, producing an overall 0–100 score and a readiness level.
+          </li>
+          <li>
+            <strong>Fix.</strong> Each failing check offers a one-click fix. Applying one writes
+            plugin settings only — it never edits your theme or rewrites posts.
+          </li>
+          <li>
+            <strong>Verify.</strong> Re-fetch over a real request to confirm the score moved. A
+            scheduled re-scan then watches for drift.
+          </li>
+        </ol>
+        <p>
+          Because every check is an HTTP request against your own site, the score reflects what a
+          crawler actually sees — including cases where a CDN or a physical <code>robots.txt</code> is
+          overriding WordPress.
+        </p>
+      </section>
+
+      <section id="rubric">
+        <h2>The rubric</h2>
+        <p>
+          Scoring is driven entirely by a versioned rubric (<code>rubric-v1</code>) — the single
+          source of truth for what gets scored and how much it’s worth. Each check earns points toward
+          its dimension; dimensions roll up to the overall score using a weighted average. Info-tier
+          results (“couldn’t verify”) and inapplicable dimensions (Commerce, unless WooCommerce is
+          active) are excluded from the denominator.
+        </p>
+        <p>The overall score maps to one of six readiness levels:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Level</th><th>Name</th><th>Score</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+              {
+                levels.map(([n, name, score, meaning]) => (
+                  <tr>
+                    <td class="c-id">{n}</td>
+                    <td><strong>{name}</strong></td>
+                    <td class="c-id">{score}</td>
+                    <td>{meaning}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p>
+          A new rubric version is a new file — the engine stays data-driven, so scoring rules can
+          evolve without changing engine code.
+        </p>
+      </section>
+
+      <section id="dimensions">
+        <h2>Dimensions &amp; checks</h2>
+        <p>Fifteen checks across five dimensions. Each is graded independently over HTTP.</p>
+        {
+          dimensions.map((d) => (
+            <>
+              <h3>
+                {d.name} <span class="mono dim-pts">— {d.pts}</span>
+              </h3>
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    {d.checks.map(([id, name, pts]) => (
+                      <tr>
+                        <td class="c-id">{id}</td>
+                        <td>{name}</td>
+                        <td class="c-pts">{pts}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ))
+        }
+      </section>
+
+      <section id="fixes">
+        <h2>Fixes &amp; reversibility</h2>
+        <p>
+          This is the part that sets Crawlwise apart from a stateless scanner: it doesn’t just tell
+          you what’s wrong, it fixes it — safely.
+        </p>
+        <ul class="bullets">
+          <li>
+            <strong>Settings only.</strong> Every fix writes plugin settings and nothing else. No
+            theme files are edited, and no posts are rewritten.
+          </li>
+          <li>
+            <strong>Genuinely reversible.</strong> Because state lives in settings, “Turn off”
+            restores the exact prior behavior. Applying the C3 fix, for example, derives the meta
+            description at render time rather than rewriting excerpts.
+          </li>
+          <li>
+            <strong>Non-destructive exports.</strong> Static export refuses to overwrite a
+            <code>robots.txt</code> or <code>llms.txt</code> it didn’t create, so a hand-maintained
+            file is never clobbered.
+          </li>
+        </ul>
+        <div class="callout callout--warn">
+          <p>
+            Enabled static export and nothing happened? It won’t overwrite an existing
+            <code>robots.txt</code>/<code>llms.txt</code>. Remove or rename the existing file if you
+            want the plugin to manage it.
+          </p>
+        </div>
+      </section>
+
+      <section id="mcp">
+        <h2>Agent (MCP) server</h2>
+        <p>
+          Crawlwise ships an optional MCP server that exposes <code>scan</code>, <code>fix</code>,
+          <code>verify</code>, and <code>revert</code> as tools an AI agent can call directly. It is
+          <strong>off by default</strong> and requires a bearer token you generate yourself.
+        </p>
+        <ol class="steps">
+          <li>
+            Go to <strong>Crawlwise → Settings</strong>, tick <strong>Enable the MCP server</strong>,
+            and click <strong>Save Changes</strong>.
+          </li>
+          <li>
+            Copy the bearer token shown. It is stored hashed and cannot be displayed again —
+            regenerate it if you lose it.
+          </li>
+          <li>Add it to your agent:</li>
+        </ol>
+        <pre><code># Register Crawlwise with your agent
+$ claude mcp add --transport http crawlwise \
+    https://your-site.com/wp-json/crawlwise/mcp \
+    --header "Authorization: Bearer &lt;token&gt;"
+
+✓ connected · tools: scan  fix  verify  revert</code></pre>
+        <div class="callout">
+          <p>
+            The token is stored as a SHA-256 hash, never included in a settings export, and can never
+            be set or enabled by a settings import.
+          </p>
+        </div>
+      </section>
+
+      <section id="privacy">
+        <h2>Privacy</h2>
+        <p>
+          Crawlwise makes HTTP requests to <strong>your own site only</strong>. It sends nothing to
+          any third party and has <strong>no telemetry</strong>.
+        </p>
+        <p>
+          <code>/llms.txt</code>, the Markdown output, and the JSON-LD graph are built exclusively
+          from public content: password-protected, private, draft, and per-entity excluded posts are
+          never included.
+        </p>
+      </section>
+
+      <section id="security">
+        <h2>Security</h2>
+        <ul class="bullets">
+          <li>
+            The MCP bearer token is stored as a SHA-256 hash. Its raw value is displayed exactly once,
+            when generated, and cannot be recovered — regenerate it if lost.
+          </li>
+          <li>
+            The token is never included in a settings export, and a settings import can never set or
+            enable it.
+          </li>
+          <li>
+            Failed MCP authentication attempts are rate-limited per IP, and cross-origin requests to
+            the MCP endpoint are rejected.
+          </li>
+          <li>
+            All dashboard REST routes require <code>manage_options</code>; per-entity routes require
+            <code>edit_post</code> for that specific post.
+          </li>
+        </ul>
+      </section>
+
+      <section id="faq">
+        <h2>FAQ</h2>
+        {
+          faqs.map((f) => (
+            <>
+              <h3>{f.q}</h3>
+              <p>{f.a}</p>
+            </>
+          ))
+        }
+      </section>
+
+      <section id="changelog">
+        <h2>Changelog</h2>
+        <h3>0.1.0 <span class="mono dim-pts">— initial release</span></h3>
+        <ul class="bullets">
+          <li>Initial release of the scan → fix → verify loop across five dimensions.</li>
+          <li>
+            <strong>Security:</strong> password-protected content excluded from Markdown output,
+            <code>/llms.txt</code>, and JSON-LD descriptions.
+          </li>
+          <li>
+            <strong>Security:</strong> the MCP bearer token is stored hashed, shown once, excluded
+            from settings export, and cannot be set by settings import.
+          </li>
+          <li>
+            <strong>Security:</strong> MCP endpoint validates <code>Origin</code> and rate-limits
+            failed authentication.
+          </li>
+          <li>
+            <strong>Fixed:</strong> <code>*.md</code> and <code>.well-known/*</code> URLs return a real
+            404 instead of the front page when a feature is off.
+          </li>
+          <li>
+            <strong>Fixed:</strong> applying the C3 fix no longer rewrites post excerpts — the meta
+            description is derived at render time.
+          </li>
+          <li><strong>Fixed:</strong> scan history is capped per scope instead of growing without bound.</li>
+        </ul>
+      </section>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .doc-head {
+    padding-block: 72px 40px;
+  }
+
+  .doc-head .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: flex-start;
+  }
+
+  .measure {
+    max-width: 660px;
+  }
+
+  .doc-layout {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    gap: 60px;
+    align-items: start;
+    padding-bottom: 100px;
+  }
+
+  .toc {
+    position: sticky;
+    top: 92px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .toc-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toc-group h2 {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .toc a {
+    font-size: 13.5px;
+    color: var(--body);
+    padding: 4px 0;
+    transition: color 0.15s ease;
+  }
+
+  .toc a:hover {
+    color: var(--accent);
+  }
+
+  .doc {
+    min-width: 0;
+    max-width: 780px;
+  }
+
+  .doc section {
+    margin-bottom: 56px;
+    scroll-margin-top: 92px;
+  }
+
+  .doc h2 {
+    font-size: 28px;
+    letter-spacing: -0.6px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .doc h3 {
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    margin-top: 32px;
+  }
+
+  .doc p {
+    margin-top: 16px;
+    font-size: 15.5px;
+    line-height: 26px;
+    color: var(--body);
+  }
+
+  .doc strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.1em 0.4em;
+    color: var(--ink);
+  }
+
+  .dim-pts {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .steps {
+    counter-reset: s;
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .steps li {
+    counter-increment: s;
+    position: relative;
+    padding-left: 42px;
+    font-size: 15.5px;
+    line-height: 25px;
+    color: var(--body);
+  }
+
+  .steps li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .bullets {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bullets li {
+    position: relative;
+    padding-left: 20px;
+    font-size: 15.5px;
+    line-height: 25px;
+    color: var(--body);
+  }
+
+  .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .callout {
+    margin-top: 20px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .callout p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 23px;
+  }
+
+  .callout--warn {
+    background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
+    box-shadow: inset 0 0 0 1px var(--accent-soft);
+  }
+
+  .table-wrap {
+    margin-top: 18px;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+    background: var(--bg);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .c-id {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+    width: 1%;
+  }
+
+  .c-pts {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  pre {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--surface-3);
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 20px;
+    color: var(--body);
+  }
+
+  pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  @media (max-width: 900px) {
+    .doc-layout {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding-bottom: 68px;
+    }
+
+    .toc {
+      position: static;
+      display: none;
+    }
+
+    .doc-head {
+      padding-block: 48px 28px;
+    }
+  }
+</style>

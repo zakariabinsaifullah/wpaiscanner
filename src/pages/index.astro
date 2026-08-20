@@ -1,0 +1,1575 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+const SITE = Astro.site.href.replace(/\/$/, '');
+
+const DOWNLOAD_URL =
+  'https://github.com/zakariabinsaifullah/wpaiscanner/releases/latest/download/aiscaner.zip';
+
+const dimensions = [
+  { label: 'Discoverability', value: 92, pct: 92 },
+  { label: 'Content', value: 78, pct: 78 },
+  { label: 'Bot Access', value: 67, pct: 67 },
+  { label: 'Capabilities', value: 58, pct: 58 },
+  { label: 'Commerce', value: 'n/a', pct: 0 },
+];
+
+const checkLog = [
+  { code: 'D1', name: 'robots.txt present', pts: '6', state: 'pass' },
+  { code: 'D2', name: 'XML sitemap', pts: '4', state: 'pass' },
+  { code: 'D3', name: 'Link header', pts: '0', state: 'fail' },
+  { code: 'C1', name: 'Markdown negotiation', pts: '0', state: 'fail' },
+  { code: 'C2', name: '/llms.txt', pts: '6', state: 'pass' },
+  { code: 'B1', name: 'Content Signals', pts: '5', state: 'pass' },
+  { code: 'B2', name: 'Explicit AI bot rules', pts: '—', state: 'na' },
+];
+
+const requestLog = [
+  { path: '/robots.txt', code: '200', ok: true },
+  { path: '/sitemap.xml', code: '200', ok: true },
+  { path: '/llms.txt', code: '404', ok: false },
+  { path: '/.well-known/mcp.json', code: '404', ok: false },
+  { path: '/.well-known/oauth-metadata', code: '404', ok: false },
+  { path: 'Accept: text/markdown', code: '406', ok: false },
+];
+
+const steps = [
+  {
+    num: 'Step 01',
+    icon: 'radar',
+    title: 'Scan over real HTTP',
+    copy: 'Grades five dimensions against a versioned rubric by fetching live URLs — never trusting internal plugin state. What a crawler sees is what gets scored.',
+  },
+  {
+    num: 'Step 02',
+    icon: 'wrench',
+    title: 'Apply one-click fixes',
+    copy: 'Every fix writes plugin settings and nothing else. No theme edits, no rewritten posts — so “Turn off” genuinely restores the prior state.',
+  },
+  {
+    num: 'Step 03',
+    icon: 'shield-check',
+    title: 'Re-scan to prove it',
+    copy: 'Verify re-fetches over a live request to confirm the score actually moved. A scheduled re-scan catches drift, so what you fixed stays fixed.',
+  },
+];
+
+const rubric = [
+  {
+    name: 'Discoverability',
+    desc: 'Can an agent find your content and its structure at all?',
+    total: '13 pts',
+    checks: [
+      { id: 'D1', check: 'robots.txt present & sane', pts: '6' },
+      { id: 'D2', check: 'XML sitemap', pts: '4' },
+      { id: 'D3', check: 'Link header for discovery', pts: '3' },
+    ],
+  },
+  {
+    name: 'Content',
+    desc: 'Is the content itself readable by a machine, not just a browser?',
+    total: '18 pts',
+    checks: [
+      { id: 'C1', check: 'Markdown content negotiation', pts: '8' },
+      { id: 'C2', check: '/llms.txt', pts: '6' },
+      { id: 'C3', check: 'Structured HTML', pts: '4' },
+    ],
+  },
+  {
+    name: 'Bot Access',
+    desc: 'Do you state, in machine terms, which agents may do what?',
+    total: '15 pts',
+    checks: [
+      { id: 'B1', check: 'Content Signals in robots.txt', pts: '5' },
+      { id: 'B2', check: 'Explicit AI bot rules', pts: '5' },
+      { id: 'B3', check: 'Web Bot Auth key directory', pts: '5' },
+    ],
+  },
+  {
+    name: 'Capabilities',
+    desc: 'Can an agent discover what your site can actually do?',
+    total: '12 pts',
+    checks: [
+      { id: 'K1', check: 'API catalog', pts: '3' },
+      { id: 'K2', check: 'MCP card', pts: '3' },
+      { id: 'K3', check: 'Agent skills', pts: '3' },
+      { id: 'K4', check: 'OAuth metadata', pts: '3' },
+    ],
+  },
+  {
+    name: 'Commerce',
+    desc: 'Can an agent transact? WooCommerce only.',
+    total: '10 pts',
+    checks: [
+      { id: 'M1', check: 'UCP signals', pts: '5' },
+      { id: 'M2', check: 'x402 signals', pts: '5' },
+    ],
+  },
+];
+
+const levels = [
+  { num: '0', name: 'Invisible', desc: 'Agents can’t reliably find or read the site.', range: '0–9' },
+  { num: '1', name: 'Discoverable', desc: 'Basic robots & sitemap signals are in place.', range: '10–29' },
+  { num: '2', name: 'Readable', desc: 'Content is available in machine-friendly form.', range: '30–49' },
+  { num: '3', name: 'Governed', desc: 'You state explicitly which bots may do what.', range: '50–69' },
+  {
+    num: '4',
+    name: 'Interactive',
+    desc: 'Capabilities & APIs are discoverable by agents.',
+    range: '70–89',
+    here: true,
+  },
+  { num: '5', name: 'Agent-Native', desc: 'Fully legible and actionable — the top of the rubric.', range: '90–100' },
+];
+
+const why = [
+  {
+    title: 'Reversible by design',
+    body: 'Every fix writes plugin settings only — no theme edits, no rewritten posts. Turning a fix off restores the exact prior state.',
+  },
+  {
+    title: 'Real HTTP verification',
+    body: 'Checks fetch your live site, catching a CDN or a physical robots.txt that overrides WordPress — the kind of thing internal state hides.',
+  },
+  {
+    title: 'Privacy-first',
+    body: 'Requests hit your own site only. Nothing is sent to a third party, and there is no telemetry — not now, not opt-out-later.',
+  },
+  {
+    title: 'Drift protection',
+    body: 'A scheduled re-scan re-checks your score on a cadence, so a theme update or host change that regresses a signal doesn’t go unnoticed.',
+  },
+  {
+    title: 'Plays well with SEO plugins',
+    body: 'Detects Yoast, Rank Math and AIOSEO and defers per feature — so you never end up with two sitemaps or two JSON-LD graphs.',
+  },
+  {
+    title: 'Agent-callable MCP server',
+    body: 'An optional MCP server exposes scan / fix / verify / revert as tools an agent can call directly. Off by default, gated by a token you generate.',
+  },
+];
+
+const mcpBullets = [
+  { icon: 'power', title: 'Off by default', desc: 'Nothing is exposed until you enable it in Settings.' },
+  {
+    icon: 'key-round',
+    title: 'Bearer-token gated',
+    desc: 'Stored as a SHA-256 hash, shown once, never in an export.',
+  },
+  { icon: 'shield', title: 'Hardened', desc: 'Origin-validated and rate-limited against failed auth per IP.' },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE}/#website`,
+      url: `${SITE}/`,
+      name: 'Crawlwise',
+      description:
+        'Crawlwise grades your WordPress site over a real HTTP request, applies one-click fixes that never touch your content, and re-scans to prove the score moved.',
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${SITE}/#app`,
+      name: 'Crawlwise',
+      url: `${SITE}/`,
+      applicationCategory: 'DeveloperApplication',
+      applicationSubCategory: 'WordPress Plugin',
+      operatingSystem: 'WordPress 6.7+',
+      description:
+        'The readiness dashboard for the machine-readable web. Scan, fix, and verify your WordPress site for AI agents.',
+      softwareVersion: '0.1.0',
+      license: 'https://www.gnu.org/licenses/gpl-2.0.html',
+      image: `${SITE}/og-image.png`,
+      downloadUrl: DOWNLOAD_URL,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    },
+  ],
+};
+---
+
+<Base
+  title="Crawlwise — See your site the way an agent does"
+  description="Crawlwise grades your WordPress site over a real HTTP request, applies one-click fixes that never touch your content, and re-scans to prove the score moved."
+  jsonLd={jsonLd}
+>
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">WordPress · AI &amp; agent readiness</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="headline-block">
+        <h1 class="hero-h1">
+          See your site the way<br />an <span class="accent">agent</span> does.
+        </h1>
+
+        <p class="lead hero-lead">
+          Crawlwise grades your WordPress site over a real HTTP request, applies one-click fixes
+          that never touch your content, and re-scans to prove the score moved.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn btn--primary" href="#get">
+            Scan my site
+            <Icon name="arrow-right" size={15} color="#FFF8EC" />
+          </a>
+          <a class="btn btn--secondary" href="#how-it-works">How it works</a>
+        </div>
+
+        <ul class="trust-row">
+          {
+            ['Reversible fixes', 'Zero telemetry', 'Real HTTP checks', 'GPL-2.0'].map((t) => (
+              <li>
+                <span class="dot"></span>
+                <span class="mono">{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Instrument panel -->
+      <div class="panel instrument">
+        <div class="panel-bar">
+          <span class="mono">Agent-readiness · rubric v1</span>
+          <span class="status">
+            <span class="status-dot"></span>
+            <span class="mono status-label">Live · GET / → 200 · 412 ms</span>
+          </span>
+        </div>
+
+        <div class="instrument-body">
+          <div class="score">
+            <div class="gauge" role="img" aria-label="Score 78 out of 100">
+              <svg viewBox="0 0 150 150" width="150" height="150">
+                <circle cx="75" cy="75" r="71.25" fill="none" stroke="#F1EFEB" stroke-width="7.5"
+                ></circle>
+                <circle
+                  cx="75"
+                  cy="75"
+                  r="71.25"
+                  fill="none"
+                  stroke="#8F5400"
+                  stroke-width="7.5"
+                  stroke-linecap="butt"
+                  stroke-dasharray="349.2 447.7"
+                  transform="rotate(-90 75 75)"></circle>
+              </svg>
+              <div class="readout">
+                <span class="score-value">78</span>
+                <span class="mono">/ 100</span>
+              </div>
+            </div>
+            <div class="level">
+              <span class="mono">Level 4</span>
+              <span class="level-name">Interactive</span>
+            </div>
+          </div>
+
+          <div class="dimensions">
+            <h3 class="mono">Dimensions</h3>
+            {
+              dimensions.map((d) => (
+                <div class="dim">
+                  <span class="dim-label">{d.label}</span>
+                  <span class="track">
+                    <span class="fill" style={`width:${d.pct}%`}></span>
+                  </span>
+                  <span class="dim-value">{d.value}</span>
+                </div>
+              ))
+            }
+          </div>
+
+          <div class="check-log">
+            <h3 class="mono">Check log</h3>
+            {
+              checkLog.map((c) => (
+                <div class="check">
+                  <span class="check-icon">
+                    {c.state === 'pass' && <Icon name="check" size={12} color="#12855A" />}
+                    {c.state === 'fail' && <Icon name="x" size={12} color="#C33A26" />}
+                    {c.state === 'na' && <Icon name="minus" size={12} color="#71777E" />}
+                  </span>
+                  <span class="check-code">{c.code}</span>
+                  <span class="check-name">{c.name}</span>
+                  <span class="check-pts">{c.pts}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== THE SHIFT ===================== -->
+  <section class="section" id="the-shift">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">The shift</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="split split--shift">
+        <div class="split-copy">
+          <h2 class="h-section">Your readers aren’t all human anymore.</h2>
+          <p class="lead">
+            ChatGPT, Claude, Perplexity and a growing fleet of agents visit sites to answer
+            questions, buy things, and act for people. They don’t read your theme — they read your
+            signals: robots rules, sitemaps, machine-readable content, capability descriptors.
+          </p>
+          <p class="lead">
+            Most WordPress sites emit almost none of them, and nothing in wp-admin tells you so.
+          </p>
+        </div>
+
+        <div class="panel request-log">
+          <div class="panel-bar">
+            <span class="mono">What an agent actually requests</span>
+            <span class="mono">6</span>
+          </div>
+          <div>
+            {
+              requestLog.map((r) => (
+                <div class="req">
+                  <span class="req-method">GET</span>
+                  <span class="req-path">{r.path}</span>
+                  <span class={`req-code ${r.ok ? 'ok' : 'bad'}`}>{r.code}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="section" id="how-it-works">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">How it works</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="section-copy">
+        <h2 class="h-section">Scan. Fix. Verify — then keep it fixed.</h2>
+        <p class="lead measure">
+          A closed loop, not a one-off report. Every check fetches your site the way a crawler
+          would, so a passing score reflects what an agent actually sees — even when a CDN or a
+          stray robots.txt is overriding WordPress.
+        </p>
+      </div>
+
+      <div class="loop-rail">
+        <span class="mono rail-step on">Scan</span>
+        <Icon name="arrow-right" size={13} color="#71777E" />
+        <span class="mono rail-step on">Fix</span>
+        <Icon name="arrow-right" size={13} color="#71777E" />
+        <span class="mono rail-step on">Verify</span>
+        <Icon name="arrow-right" size={13} color="#71777E" />
+        <span class="mono rail-step">Re-scan</span>
+        <span class="rail-spacer"></span>
+        <Icon name="repeat" size={13} color="#71777E" />
+        <span class="mono">Scheduled · weekly</span>
+      </div>
+
+      <div class="steps">
+        {
+          steps.map((s) => (
+            <article class="step">
+              <div class="step-head">
+                <Icon name={s.icon} size={15} color="#8F5400" />
+                <span class="mono">{s.num}</span>
+              </div>
+              <h3 class="step-title">{s.title}</h3>
+              <p class="step-copy">{s.copy}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== THE RUBRIC ===================== -->
+  <section class="section" id="the-rubric">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">What it grades</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="section-copy">
+        <h2 class="h-section">Five dimensions. Fifteen checks. One weighted score.</h2>
+        <p class="lead measure">
+          Each check earns points toward its dimension; dimensions roll up to an overall 0–100
+          score and a readiness level. Inapplicable dimensions leave the denominator, so the number
+          always reflects your site.
+        </p>
+      </div>
+
+      <div class="panel rubric">
+        <div class="rubric-head">
+          <span class="mono col-id">ID</span>
+          <span class="mono col-check">Dimension / check</span>
+          <span class="mono col-pts">Points</span>
+        </div>
+
+        {
+          rubric.map((dim) => (
+            <>
+              <div class="dim-row">
+                <span class="dim-name">
+                  <span class="tick" />
+                  <span class="dim-title">{dim.name}</span>
+                </span>
+                <span class="dim-desc">{dim.desc}</span>
+                <span class="dim-total">{dim.total}</span>
+              </div>
+              {dim.checks.map((c) => (
+                <div class="check-row">
+                  <span class="col-id mono-id">{c.id}</span>
+                  <span class="col-check check-text">{c.check}</span>
+                  <span class="col-pts pts">{c.pts}</span>
+                </div>
+              ))}
+            </>
+          ))
+        }
+
+        <div class="total-row">
+          <span class="mono total-label">Total</span>
+          <span class="total-note">15 checks across 5 dimensions · points earned ÷ points possible</span>
+          <span class="total-sum">68</span>
+        </div>
+      </div>
+
+      <div class="notes">
+        <div class="note">
+          <h3 class="note-title">Info-tier results never score</h3>
+          <p class="note-body">
+            A “couldn’t verify” result stays informational. A blocked loopback never becomes a
+            misleading pass — or a misleading fail.
+          </p>
+        </div>
+        <div class="note">
+          <h3 class="note-title">Defers to your SEO plugin</h3>
+          <p class="note-body">
+            Detects Yoast, Rank Math and AIOSEO per feature, so you never end up with two sitemaps
+            or two JSON-LD graphs.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== READINESS LADDER ===================== -->
+  <section class="section" id="scoring">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">The readiness ladder</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="section-copy">
+        <h2 class="h-section">From invisible to agent-native.</h2>
+        <p class="lead measure">
+          Your overall score maps to one of six levels. It’s a real progression — each rung assumes
+          the one below it — and it doubles as a shareable badge.
+        </p>
+      </div>
+
+      <div class="scale">
+        <div class="marker">
+          <div class="you">
+            <span class="mono you-label">Your site · 78</span>
+            <span class="stem"></span>
+          </div>
+        </div>
+        <div class="segments">
+          <span class="seg soft" style="flex:113"></span>
+          <span class="seg soft" style="flex:227"></span>
+          <span class="seg soft" style="flex:227"></span>
+          <span class="seg soft" style="flex:227"></span>
+          <span class="seg" style="flex:227"><span class="seg-fill" style="width:40%"></span></span>
+          <span class="seg" style="flex:124"></span>
+        </div>
+        <div class="ticks">
+          <span class="mono" style="flex:113">0–9</span>
+          <span class="mono" style="flex:227">10–29</span>
+          <span class="mono" style="flex:227">30–49</span>
+          <span class="mono" style="flex:227">50–69</span>
+          <span class="mono tick-on" style="flex:227">70–89</span>
+          <span class="mono" style="flex:124">90–100</span>
+        </div>
+      </div>
+
+      <div class="panel levels">
+        {
+          levels.map((l) => (
+            <div class={`level-row${l.here ? ' is-here' : ''}`}>
+              <span class="level-num">{l.num}</span>
+              <span class="level-text">
+                <span class="level-name-row">
+                  <span class="level-title">{l.name}</span>
+                  {l.here && <span class="badge">You are here</span>}
+                </span>
+                <span class="level-desc">{l.desc}</span>
+              </span>
+              <span class="level-range">{l.range}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHY CRAWLWISE ===================== -->
+  <section class="section" id="why">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Why Crawlwise</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="split split--why">
+        <div class="split-copy sticky-copy">
+          <h2 class="h-split">A scanner you can trust to fix things.</h2>
+          <p class="lead">
+            Plenty of tools flag what’s missing. Crawlwise fixes it safely, proves the fix over a
+            live request, and stays out of your content’s way.
+          </p>
+        </div>
+
+        <div class="why-list">
+          {
+            why.map((w) => (
+              <div class="why-item">
+                <h3 class="why-title">{w.title}</h3>
+                <p class="why-body">{w.body}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AGENT API ===================== -->
+  <section class="section section--white" id="agent-api">
+    <div class="wrap section-inner">
+      <div class="eyebrow-row">
+        <span class="eyebrow">For agents, by design</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="split split--api">
+        <div class="split-copy">
+          <h2 class="h-split">Let an agent run the whole loop.</h2>
+          <p class="lead">
+            Flip on the optional MCP server and your readiness workflow becomes a set of tools an
+            AI agent can invoke itself — scan, apply a fix, verify over HTTP, revert if needed.
+          </p>
+
+          <div class="bullets">
+            {
+              mcpBullets.map((b) => (
+                <div class="bullet">
+                  <Icon name={b.icon} size={15} color="#8F5400" />
+                  <span class="bullet-text">
+                    <span class="bullet-title">{b.title}</span>
+                    <span class="bullet-desc">{b.desc}</span>
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="terminal">
+          <div class="panel-bar terminal-bar">
+            <span class="mono">Agent · add MCP server</span>
+            <span class="status">
+              <span class="status-dot"></span>
+              <span class="mono status-label">Connected</span>
+            </span>
+          </div>
+          <pre class="terminal-lines"><span class="t-comment"># Register Crawlwise as an MCP server</span>
+<span class="t-cmd">$ claude mcp add --transport http crawlwise \</span>
+<span class="t-arg">    https://your-site.com/wp-json/crawlwise/mcp \</span>
+<span class="t-arg">    --header "Authorization: Bearer ••••••••••"</span>
+
+<span class="t-ok">✓ connected · 4 tools available</span>
+<span class="t-tools">  scan   fix   verify   revert</span>
+
+<span class="t-comment">agent&gt; scan, then fix everything failing</span>
+<span class="t-comment"># → 61 → applied D1, C2, B1 → verified → 84</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section class="section cta" id="get">
+    <div class="wrap cta-inner">
+      <span class="eyebrow">Free · GPL-2.0 · WordPress 6.7+</span>
+      <h2 class="cta-h2">Make your site agent-native.</h2>
+      <p class="lead cta-body">
+        Install Crawlwise, run one scan, and see exactly where you stand with the machines that are
+        already reading the web.
+      </p>
+      <div class="cta-buttons">
+        <a class="btn btn--primary btn--lg" href={DOWNLOAD_URL}>
+          <Icon name="download" size={15} color="#FFF8EC" />
+          Download the plugin
+        </a>
+        <a class="btn btn--secondary btn--lg" href="/docs/">Read the docs</a>
+      </div>
+      <span class="mono cta-micro">One scan · reversible fixes · no account, no telemetry</span>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    padding-block: 86px 104px;
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .headline-block {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    align-items: flex-start;
+  }
+
+  .hero-h1 {
+    font-size: clamp(38px, 5.28vw, 76px);
+    line-height: 1.04;
+    letter-spacing: -2.6px;
+  }
+
+  .accent {
+    color: var(--accent);
+  }
+
+  .hero-lead {
+    max-width: 600px;
+  }
+
+  .cta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+
+  .trust-row li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-label {
+    color: var(--body);
+  }
+
+  /* instrument */
+  .instrument-body {
+    display: grid;
+    grid-template-columns: 300px 1fr 340px;
+  }
+
+  .score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 30px 28px;
+    border-right: 1px solid var(--border);
+  }
+
+  .gauge {
+    position: relative;
+    width: 150px;
+    height: 150px;
+  }
+
+  .readout {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+  }
+
+  .score-value {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 600;
+    letter-spacing: -2px;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .level {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .level-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .dimensions,
+  .check-log {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 26px 28px;
+    min-width: 0;
+  }
+
+  .check-log {
+    gap: 13px;
+    border-left: 1px solid var(--border);
+  }
+
+  .dim {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .dim-label {
+    width: 112px;
+    flex: none;
+    font-size: 12.5px;
+    color: var(--body);
+  }
+
+  .track {
+    flex: 1 1 0;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .fill {
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+
+  .dim-value {
+    width: 34px;
+    flex: none;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .check-icon {
+    display: grid;
+    place-items: center;
+    width: 12px;
+    flex: none;
+  }
+
+  .check-code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex: none;
+  }
+
+  .check-name {
+    flex: 1 1 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--body);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .check-pts {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink);
+    flex: none;
+  }
+
+  /* ---------- shared section pieces ---------- */
+  .section-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .measure {
+    max-width: 660px;
+  }
+
+  .split {
+    display: grid;
+    gap: 100px;
+    align-items: start;
+  }
+
+  .split--shift {
+    grid-template-columns: 1fr 452px;
+    gap: 88px;
+  }
+
+  .split--why {
+    grid-template-columns: 400px 1fr;
+  }
+
+  .split--api {
+    grid-template-columns: 452px 1fr;
+    gap: 88px;
+  }
+
+  .split-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+  }
+
+  /* request log */
+  .req {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 46px;
+    padding-inline: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .req:first-child {
+    border-top: 0;
+  }
+
+  .req-method {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex: none;
+  }
+
+  .req-path {
+    flex: 1 1 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .req-code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    flex: none;
+  }
+
+  .req-code.ok {
+    color: var(--pass);
+  }
+
+  .req-code.bad {
+    color: var(--fail);
+  }
+
+  /* loop rail */
+  .loop-rail {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 46px;
+    padding-inline: 22px;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow-x: auto;
+  }
+
+  .rail-step.on {
+    color: var(--accent);
+  }
+
+  .rail-spacer {
+    flex: 1 1 0;
+    min-width: 8px;
+  }
+
+  /* steps */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 40px;
+    border-left: 1px solid var(--border);
+  }
+
+  .step:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .step:last-child {
+    padding-right: 0;
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .step-title {
+    font-size: 21px;
+    letter-spacing: -0.4px;
+  }
+
+  .step-copy {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--body);
+  }
+
+  /* rubric table */
+  .rubric-head,
+  .check-row,
+  .dim-row,
+  .total-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-inline: 24px;
+  }
+
+  .rubric-head {
+    height: 42px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .col-id {
+    width: 64px;
+    flex: none;
+  }
+
+  .col-check {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .col-pts {
+    width: 74px;
+    flex: none;
+    text-align: right;
+  }
+
+  .dim-row {
+    height: 54px;
+    background: var(--surface-2);
+  }
+
+  .dim-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 230px;
+    flex: none;
+  }
+
+  .tick {
+    width: 2px;
+    height: 16px;
+    background: var(--accent);
+    flex: none;
+  }
+
+  .dim-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+  }
+
+  .dim-desc {
+    flex: 1 1 0;
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 0;
+  }
+
+  .dim-total {
+    width: 74px;
+    flex: none;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--accent);
+  }
+
+  .check-row {
+    height: 46px;
+    border-top: 1px solid var(--border);
+  }
+
+  .mono-id {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .check-text {
+    font-size: 13.5px;
+    color: var(--body);
+  }
+
+  .pts {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  .total-row {
+    height: 54px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .total-label {
+    width: 64px;
+    flex: none;
+    color: var(--ink);
+  }
+
+  .total-note {
+    flex: 1 1 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 0;
+  }
+
+  .total-sum {
+    width: 74px;
+    flex: none;
+    text-align: right;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    color: var(--accent);
+  }
+
+  /* notes */
+  .notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+  }
+
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding-left: 16px;
+    border-left: 1px solid var(--border-strong);
+  }
+
+  .note-title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .note-body {
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--body);
+  }
+
+  /* scale */
+  .scale {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .marker {
+    position: relative;
+    height: 26px;
+  }
+
+  .you {
+    position: absolute;
+    left: 71.3%;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transform: translateX(-50%);
+  }
+
+  .you-label {
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .stem {
+    width: 1px;
+    height: 8px;
+    background: var(--accent);
+  }
+
+  .segments,
+  .ticks {
+    display: flex;
+    gap: 3px;
+  }
+
+  .seg {
+    height: 10px;
+    border-radius: 2px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .seg.soft {
+    background: var(--accent-soft);
+  }
+
+  .seg-fill {
+    display: block;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+
+  .tick-on {
+    color: var(--accent);
+  }
+
+  /* levels */
+  .level-row {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 74px;
+    padding-inline: 26px;
+    border-top: 1px solid var(--border);
+  }
+
+  .level-row:first-child {
+    border-top: 0;
+  }
+
+  .level-row.is-here {
+    background: var(--surface-2);
+  }
+
+  .level-num {
+    width: 38px;
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    color: var(--muted);
+  }
+
+  .is-here .level-num {
+    color: var(--accent);
+  }
+
+  .level-text {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .level-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .level-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+  }
+
+  .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .level-desc {
+    font-size: 13px;
+    color: var(--body);
+  }
+
+  .level-range {
+    width: 80px;
+    flex: none;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .is-here .level-range {
+    color: var(--accent);
+  }
+
+  /* why list */
+  .why-list {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .why-item {
+    display: flex;
+    gap: 28px;
+    padding-block: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .why-item:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .why-title {
+    width: 200px;
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .why-body {
+    flex: 1 1 0;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--body);
+  }
+
+  .sticky-copy {
+    position: sticky;
+    top: 100px;
+  }
+
+  /* agent api */
+  .bullets {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bullet {
+    display: flex;
+    gap: 13px;
+    padding-block: 16px;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .bullet :global(svg) {
+    margin-top: 3px;
+    flex: none;
+  }
+
+  .bullet-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .bullet-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .bullet-desc {
+    font-size: 13px;
+    line-height: 21px;
+    color: var(--body);
+  }
+
+  .terminal {
+    background: var(--surface-3);
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .terminal-bar {
+    height: 40px;
+    padding-inline: 18px;
+  }
+
+  .terminal-lines {
+    margin: 0;
+    padding: 22px 20px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 17px;
+    color: var(--body);
+    overflow-x: auto;
+  }
+
+  .t-comment {
+    color: var(--muted);
+  }
+
+  .t-cmd {
+    color: var(--accent);
+  }
+
+  .t-arg {
+    color: var(--body);
+  }
+
+  .t-ok {
+    color: var(--pass);
+  }
+
+  .t-tools {
+    color: var(--ink);
+  }
+
+  .terminal-bar .status-label {
+    color: var(--pass);
+  }
+
+  /* CTA */
+  .cta {
+    padding-block: 118px 124px;
+  }
+
+  .cta-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    text-align: center;
+  }
+
+  .cta-h2 {
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    max-width: 900px;
+  }
+
+  .cta-body {
+    max-width: 600px;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 10px;
+  }
+
+  .cta-micro {
+    color: var(--muted);
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1100px) {
+    .instrument-body {
+      grid-template-columns: 260px 1fr;
+    }
+
+    .check-log {
+      grid-column: 1 / -1;
+      border-left: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .split--shift,
+    .split--api,
+    .split--why {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .sticky-copy {
+      position: static;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      padding-block: 56px 72px;
+    }
+
+    .hero-inner {
+      gap: 40px;
+    }
+
+    .instrument-body {
+      grid-template-columns: 1fr;
+    }
+
+    .score {
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .step {
+      border-left: 0;
+      border-top: 1px solid var(--border);
+      padding: 24px 0 0;
+    }
+
+    .step:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .notes {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .why-item {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .why-title {
+      width: auto;
+    }
+
+    .cta {
+      padding-block: 72px 76px;
+    }
+
+    .dim-name {
+      width: 150px;
+    }
+
+    .dim-desc {
+      display: none;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .rubric-head,
+    .check-row,
+    .dim-row,
+    .total-row {
+      padding-inline: 16px;
+      gap: 10px;
+    }
+
+    .col-id,
+    .total-label {
+      width: 42px;
+    }
+
+    .col-pts {
+      width: 46px;
+    }
+
+    .level-row {
+      height: auto;
+      padding-block: 18px;
+      gap: 14px;
+    }
+
+    .level-num {
+      width: 28px;
+      font-size: 24px;
+    }
+  }
+</style>

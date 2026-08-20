@@ -1,14 +1,15 @@
 # Download button → private-repo release mirror
 
-The "Download the Plugin" button on the homepage points at:
+The "Download the plugin" button on the Crawlwise homepage points at:
 
 ```
 https://github.com/zakariabinsaifullah/wpaiscanner/releases/latest/download/aiscaner.zip
 ```
 
 This is GitHub's **latest-release permalink**: it always resolves to the newest
-release's `aiscaner.zip` asset, so the homepage HTML never needs editing when a
-new version ships.
+release's `aiscaner.zip` asset, so the site never needs editing when a
+new version ships. The URL lives in one place: `DOWNLOAD_URL` at the top of
+`src/pages/index.astro`.
 
 The plugin source lives in the **private** `zakariabinsaifullah/aiscaner` repo.
 Release assets inherit repo visibility, so a private repo's asset can't be
