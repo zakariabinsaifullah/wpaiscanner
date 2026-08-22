@@ -1,9 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 
 const SITE = Astro.site.href.replace(/\/$/, '');
 
-const toc = [
+const sidebar = [
   {
     group: 'Getting started',
     items: [
@@ -36,11 +37,45 @@ const toc = [
   },
 ];
 
+// Rendered active so the sidebar is never blank before the observer runs.
+const firstSectionId = sidebar[0].items[0].id;
+
+const installSteps = [
+  {
+    title: 'Upload',
+    desc: 'Upload the crawlwise folder to /wp-content/plugins/, or install it through Plugins → Add New.',
+  },
+  { title: 'Activate', desc: 'Activate the plugin through the Plugins screen.' },
+  { title: 'Scan', desc: 'Open Crawlwise in the admin menu and click Scan to grade your site.' },
+  {
+    title: 'Fix & verify',
+    desc: 'Apply a fix from any failing check, then click Verify to confirm the change over a real HTTP request.',
+  },
+];
+
+const loop = [
+  {
+    icon: 'scan-line',
+    title: 'Scan',
+    desc: 'Crawlwise fetches your live URLs and grades five dimensions against the rubric.',
+  },
+  {
+    icon: 'wrench',
+    title: 'Fix',
+    desc: 'Each failing check offers a one-click fix. Applying one writes plugin settings only — it never edits your theme or rewrites posts.',
+  },
+  {
+    icon: 'badge-check',
+    title: 'Verify',
+    desc: 'Re-fetch over a real request to confirm the score moved. A scheduled re-scan then watches for drift.',
+  },
+];
+
 const levels = [
   ['5', 'Agent-Native', '90–100', 'Fully legible and actionable to agents.'],
-  ['4', 'Interactive', '70–89', 'Capabilities & APIs are discoverable.'],
-  ['3', 'Governed', '50–69', 'Explicit rules for which bots may do what.'],
-  ['2', 'Readable', '30–49', 'Content available in machine-friendly form.'],
+  ['4', 'Interactive', '75–89', 'Capabilities & APIs are discoverable.'],
+  ['3', 'Governed', '55–74', 'Explicit rules for which bots may do what.'],
+  ['2', 'Readable', '30–54', 'Content available in machine-friendly form.'],
   ['1', 'Discoverable', '10–29', 'Basic robots & sitemap signals present.'],
   ['0', 'Invisible', '0–9', 'Agents can’t reliably find or read the site.'],
 ];
@@ -48,67 +83,105 @@ const levels = [
 const dimensions = [
   {
     name: 'Discoverability',
-    pts: '13 pts',
+    pts: '11 pts',
     checks: [
-      ['D1', 'robots.txt present & sane', '6 pts · core'],
-      ['D2', 'XML sitemap', '4 pts · core'],
-      ['D3', 'Link header for discovery', '3 pts · core'],
+      ['D1', 'robots.txt present & sane', 'Core', '4 pts'],
+      ['D2', 'XML sitemap', 'Core', '4 pts'],
+      ['D3', 'Link header for discovery', 'Core', '3 pts'],
     ],
   },
   {
     name: 'Content',
     pts: '18 pts',
     checks: [
-      ['C1', 'Markdown content negotiation', '8 pts · core'],
-      ['C2', '/llms.txt', '6 pts · core'],
-      ['C3', 'Structured HTML (headings, landmarks, FAQ, tables)', '4 pts · core'],
+      ['C1', 'Markdown content negotiation', 'Core', '8 pts'],
+      ['C2', '/llms.txt', 'Core', '6 pts'],
+      ['C3', 'Structured HTML (headings, landmarks, FAQ, tables)', 'Core', '4 pts'],
     ],
   },
   {
     name: 'Bot Access',
     pts: '15 pts',
     checks: [
-      ['B1', 'Content Signals in robots.txt', '5 pts · core'],
-      ['B2', 'Explicit AI bot rules', '5 pts · core'],
-      ['B3', 'Web Bot Auth key directory', '5 pts · advanced'],
+      ['B1', 'Content Signals in robots.txt', 'Core', '5 pts'],
+      ['B2', 'Explicit AI bot rules', 'Core', '5 pts'],
+      ['B3', 'Web Bot Auth key directory', 'Advanced', '5 pts'],
     ],
   },
   {
     name: 'Capabilities',
     pts: '12 pts',
     checks: [
-      ['K1', 'API catalog', '3 pts · advanced'],
-      ['K2', 'MCP card', '3 pts · advanced'],
-      ['K3', 'Agent skills', '3 pts · advanced'],
-      ['K4', 'OAuth metadata', '3 pts · advanced'],
+      ['K1', 'API catalog', 'Advanced', '3 pts'],
+      ['K2', 'MCP card', 'Advanced', '3 pts'],
+      ['K3', 'Agent skills', 'Advanced', '3 pts'],
+      ['K4', 'OAuth metadata', 'Advanced', '3 pts'],
     ],
   },
   {
     name: 'Commerce',
-    pts: '10 pts · WooCommerce only',
+    flag: '· Recommended only',
+    pts: '10 pts',
     checks: [
-      ['M1', 'UCP signals', '5 pts · advanced'],
-      ['M2', 'x402 signals', '5 pts · advanced'],
+      ['M1', 'UCP signals', 'Advanced', '5 pts'],
+      ['M2', 'x402 signals', 'Advanced', '5 pts'],
     ],
   },
+];
+
+const fixRules = [
+  {
+    title: 'Settings only',
+    desc: 'Every fix writes plugin settings and nothing else. No theme files are edited, and no posts are rewritten.',
+  },
+  {
+    title: 'Genuinely reversible',
+    desc: 'Because state lives in settings, “Turn off” restores the exact prior behavior. Applying the C3 fix, for example, derives the meta description at render time rather than rewriting excerpts.',
+  },
+  {
+    title: 'Non-destructive exports',
+    desc: 'Static export refuses to overwrite a robots.txt or llms.txt it didn’t create, so a hand-maintained file is never clobbered.',
+  },
+];
+
+const mcpSteps = [
+  {
+    title: 'Enable',
+    desc: 'Go to Crawlwise → Settings, tick Enable the MCP server, and click Save Changes.',
+  },
+  {
+    title: 'Copy the token',
+    desc: 'It is stored hashed and cannot be displayed again — regenerate it if you lose it.',
+  },
+  {
+    title: 'Register with your agent',
+    desc: 'Add the endpoint and bearer token to Claude Code, Cursor, or any MCP-capable client:',
+  },
+];
+
+const securityPoints = [
+  'The MCP bearer token is stored as a SHA-256 hash and cannot be recovered.',
+  'The token is never included in a settings export.',
+  'Failed MCP authentication attempts are rate-limited and rejected.',
+  'All dashboard REST routes require the manage_options capability.',
 ];
 
 const faqs = [
   {
     q: 'Does it conflict with Yoast, Rank Math, or AIOSEO?',
-    a: 'No. Crawlwise detects them and defers per feature, so you don’t get two sitemaps, two meta descriptions, or two JSON-LD graphs.',
+    a: 'No. Crawlwise detects them and defers per feature — you’ll never get duplicate meta descriptions or two JSON-LD graphs.',
   },
   {
     q: 'Why does a check say “couldn’t verify”?',
-    a: 'Some hosts block a site from making HTTP requests to itself. When that happens Crawlwise reports an informational result rather than guessing, so a blocked loopback never becomes a misleading pass or fail.',
+    a: 'Some hosts block a site from making HTTP requests to itself. Crawlwise reports an informational result rather than guessing a misleading pass or fail.',
   },
   {
     q: 'I enabled static export and nothing happened.',
-    a: 'Static export refuses to overwrite a robots.txt or llms.txt it did not create, so a hand-maintained file is never clobbered. Remove or rename the existing file if you want the plugin to manage it.',
+    a: 'Static export refuses to overwrite an existing robots.txt or llms.txt — your file is never clobbered. Remove or rename it if you want the plugin to manage that path.',
   },
   {
     q: 'What happens when I uninstall?',
-    a: 'Uninstalling removes the custom table, all options and transients, the scheduled re-scan, and any files the plugin exported.',
+    a: 'Uninstalling removes the custom table, all options and every emitted route. Your site is left exactly as Crawlwise found it.',
   },
 ];
 
@@ -151,315 +224,502 @@ const jsonLd = {
   description="Documentation for Crawlwise: installation, the scoring rubric, one-click fixes, the agent-callable MCP server, privacy, security, and FAQ."
   jsonLd={jsonLd}
 >
-  <section class="doc-head">
-    <div class="wrap">
-      <div class="eyebrow-row">
-        <span class="eyebrow">Documentation · v0.1.0</span>
-        <span class="rule"></span>
+  <!-- ===================== HERO ===================== -->
+  <section class="doc-hero">
+    <div class="docwrap hero-row">
+      <div class="hero-copy">
+        <div class="eyebrow-row">
+          <span class="eyebrow">Documentation · v0.1.0</span>
+          <span class="rule"></span>
+        </div>
+        <h1 class="hero-title">Everything you need to run Crawlwise.</h1>
+        <p class="hero-intro">
+          Install it, understand the rubric, apply reversible fixes, and — if you want — hand the
+          whole loop to an agent over MCP.
+        </p>
       </div>
-      <h1 class="h-section">Everything you need to run Crawlwise.</h1>
-      <p class="lead measure">
-        Install it, understand the rubric, apply reversible fixes, and — if you want — hand the
-        whole loop to an agent over MCP.
-      </p>
+
+      <div class="hero-side">
+        <label class="search" for="doc-search">
+          <Icon name="search" size={15} color="var(--muted)" />
+          <input id="doc-search" type="search" placeholder="Search the docs…" autocomplete="off" />
+          <kbd class="kbd">⌘K</kbd>
+        </label>
+        <span class="mono hero-meta">Last updated Aug 2026 · rubric-v1</span>
+      </div>
     </div>
   </section>
 
-  <div class="wrap doc-layout">
-    <aside class="toc" aria-label="On this page">
+  <!-- ===================== BODY ===================== -->
+  <div class="docwrap body-row">
+    <aside class="sidebar" aria-label="Documentation sections">
       {
-        toc.map((g) => (
-          <div class="toc-group">
-            <h2 class="mono">{g.group}</h2>
+        sidebar.map((g) => (
+          <div class="side-group">
+            <div class="group-head">
+              <span class="mono group-label">{g.group}</span>
+            </div>
             {g.items.map((i) => (
-              <a href={`#${i.id}`}>{i.label}</a>
+              <a
+                class:list={['side-item', { 'is-active': i.id === firstSectionId }]}
+                href={`#${i.id}`}
+              >
+                <span class="marker" />
+                <span class="item-label">{i.label}</span>
+              </a>
             ))}
           </div>
         ))
       }
     </aside>
 
-    <article class="doc">
-      <section id="install">
-        <h2>Installation</h2>
-        <p>Crawlwise requires WordPress 6.7+ and PHP 7.4+.</p>
-        <ol class="steps">
-          <li>
-            Upload the <code>crawlwise</code> folder to <code>/wp-content/plugins/</code>, or install
-            it through <strong>Plugins → Add New</strong>.
-          </li>
-          <li>Activate the plugin through the Plugins screen.</li>
-          <li>
-            Open <strong>Crawlwise</strong> in the admin menu and click <strong>Scan</strong> to grade
-            your site.
-          </li>
-          <li>
-            Apply a fix from any failing check, then click <strong>Verify</strong> to confirm the
-            change over a real HTTP request.
-          </li>
+    <div class="doc-content">
+      <!-- 01 Installation -->
+      <section class="sec" id="install">
+        <div class="eyebrow-row">
+          <span class="eyebrow">01 · Getting started</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Installation</h2>
+        <p class="sec-intro">Crawlwise requires WordPress 6.7+ and PHP 7.4+.</p>
+
+        <ol class="card steps">
+          {
+            installSteps.map((s, i) => (
+              <li class="step">
+                <span class="step-no">{i + 1}</span>
+                <span class="step-copy">
+                  <span class="step-title">{s.title}</span>
+                  <span class="step-desc">{s.desc}</span>
+                </span>
+              </li>
+            ))
+          }
         </ol>
-        <div class="callout">
-          <p>
+
+        <div class="note">
+          <Icon name="info" size={15} color="var(--accent)" />
+          <p class="note-text">
             Activation creates one custom table (<code>&#123;prefix&#125;_crawlwise_scans</code>) for
-            score history and flushes rewrite rules so <code>/llms.txt</code>, <code>*.md</code>, and
-            <code>.well-known/*</code> routes can resolve.
+            score history and flushes rewrite rules so <code>/llms.txt</code>, <code>*.md</code> and
+            <code>.well-known/</code> routes can resolve.
           </p>
         </div>
       </section>
 
-      <section id="quickstart">
-        <h2>Quick start</h2>
-        <p>The core workflow is a three-beat loop you can repeat any time your site changes:</p>
-        <ol class="steps">
-          <li>
-            <strong>Scan.</strong> Crawlwise fetches your live URLs and grades five dimensions against
-            the rubric, producing an overall 0–100 score and a readiness level.
-          </li>
-          <li>
-            <strong>Fix.</strong> Each failing check offers a one-click fix. Applying one writes
-            plugin settings only — it never edits your theme or rewrites posts.
-          </li>
-          <li>
-            <strong>Verify.</strong> Re-fetch over a real request to confirm the score moved. A
-            scheduled re-scan then watches for drift.
-          </li>
-        </ol>
-        <p>
+      <!-- 02 Quick start -->
+      <section class="sec" id="quickstart">
+        <div class="eyebrow-row">
+          <span class="eyebrow">02 · Quick start</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">The three-beat loop</h2>
+        <p class="sec-intro">
+          The core workflow is a three-beat loop you can repeat any time your site changes,
+          producing an overall 0–100 score and a readiness level.
+        </p>
+
+        <div class="loop-cards">
+          {
+            loop.map((l) => (
+              <div class="card loop-card">
+                <div class="loop-head">
+                  <Icon name={l.icon} size={15} color="var(--accent)" />
+                  <span class="loop-title">{l.title}</span>
+                </div>
+                <p class="loop-desc">{l.desc}</p>
+              </div>
+            ))
+          }
+        </div>
+
+        <p class="sec-outro">
           Because every check is an HTTP request against your own site, the score reflects what a
           crawler actually sees — including cases where a CDN or a physical <code>robots.txt</code> is
           overriding WordPress.
         </p>
       </section>
 
-      <section id="rubric">
-        <h2>The rubric</h2>
-        <p>
-          Scoring is driven entirely by a versioned rubric (<code>rubric-v1</code>) — the single
-          source of truth for what gets scored and how much it’s worth. Each check earns points toward
-          its dimension; dimensions roll up to the overall score using a weighted average. Info-tier
-          results (“couldn’t verify”) and inapplicable dimensions (Commerce, unless WooCommerce is
-          active) are excluded from the denominator.
-        </p>
-        <p>The overall score maps to one of six readiness levels:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Level</th><th>Name</th><th>Score</th><th>Meaning</th></tr>
-            </thead>
-            <tbody>
-              {
-                levels.map(([n, name, score, meaning]) => (
-                  <tr>
-                    <td class="c-id">{n}</td>
-                    <td><strong>{name}</strong></td>
-                    <td class="c-id">{score}</td>
-                    <td>{meaning}</td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
+      <!-- 03 The rubric -->
+      <section class="sec" id="rubric">
+        <div class="eyebrow-row">
+          <span class="eyebrow">03 · Concepts</span>
+          <span class="rule"></span>
         </div>
-        <p>
+        <h2 class="sec-title">The rubric</h2>
+        <p class="sec-intro">
+          Scoring is driven entirely by a versioned rubric (<code>rubric-v1</code>) — the single
+          source of truth for what gets scored and how much it’s worth. Dimensions roll up to the
+          overall score using a weighted average; info-tier results and inapplicable dimensions are
+          excluded from the denominator.
+        </p>
+
+        <div class="card levels">
+          <div class="levels-head">
+            <span class="mono c-level">Level</span>
+            <span class="mono c-name">Name</span>
+            <span class="mono c-score">Score</span>
+            <span class="mono c-meaning">Meaning</span>
+          </div>
+          {
+            levels.map(([no, name, score, meaning]) => (
+              <div class="level-row">
+                <span class="c-level">
+                  <span class="level-chip">{no}</span>
+                </span>
+                <span class="c-name level-name">{name}</span>
+                <span class="c-score level-score">{score}</span>
+                <span class="c-meaning level-meaning">{meaning}</span>
+              </div>
+            ))
+          }
+        </div>
+
+        <p class="sec-outro muted">
           A new rubric version is a new file — the engine stays data-driven, so scoring rules can
           evolve without changing engine code.
         </p>
       </section>
 
-      <section id="dimensions">
-        <h2>Dimensions &amp; checks</h2>
-        <p>Fifteen checks across five dimensions. Each is graded independently over HTTP.</p>
-        {
-          dimensions.map((d) => (
-            <>
-              <h3>
-                {d.name} <span class="mono dim-pts">— {d.pts}</span>
-              </h3>
-              <div class="table-wrap">
-                <table>
-                  <tbody>
-                    {d.checks.map(([id, name, pts]) => (
-                      <tr>
-                        <td class="c-id">{id}</td>
-                        <td>{name}</td>
-                        <td class="c-pts">{pts}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <!-- 04 Dimensions -->
+      <section class="sec" id="dimensions">
+        <div class="eyebrow-row">
+          <span class="eyebrow">04 · Concepts</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Dimensions &amp; checks</h2>
+        <p class="sec-intro">
+          Fifteen checks across five dimensions. Each is graded independently over HTTP.
+        </p>
+
+        <div class="dim-grid">
+          {
+            dimensions.map((d) => (
+              <div class="card dim">
+                <div class="dim-bar">
+                  <span class="dim-left">
+                    <span class="mono dim-title">{d.name}</span>
+                    {d.flag && <span class="mono dim-flag">{d.flag}</span>}
+                  </span>
+                  <span class="mono dim-pts">{d.pts}</span>
+                </div>
+                <div class="dim-body">
+                  {d.checks.map(([id, name, tier, pts]) => (
+                    <div class="check">
+                      <span class="check-code">{id}</span>
+                      <span class="check-name">{name}</span>
+                      <span class="mono tier">{tier}</span>
+                      <span class="check-pts">{pts}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </>
-          ))
-        }
+            ))
+          }
+        </div>
       </section>
 
-      <section id="fixes">
-        <h2>Fixes &amp; reversibility</h2>
-        <p>
+      <!-- 05 Fixes -->
+      <section class="sec" id="fixes">
+        <div class="eyebrow-row">
+          <span class="eyebrow">05 · Concepts</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Fixes &amp; reversibility</h2>
+        <p class="sec-intro">
           This is the part that sets Crawlwise apart from a stateless scanner: it doesn’t just tell
           you what’s wrong, it fixes it — safely.
         </p>
-        <ul class="bullets">
-          <li>
-            <strong>Settings only.</strong> Every fix writes plugin settings and nothing else. No
-            theme files are edited, and no posts are rewritten.
-          </li>
-          <li>
-            <strong>Genuinely reversible.</strong> Because state lives in settings, “Turn off”
-            restores the exact prior behavior. Applying the C3 fix, for example, derives the meta
-            description at render time rather than rewriting excerpts.
-          </li>
-          <li>
-            <strong>Non-destructive exports.</strong> Static export refuses to overwrite a
-            <code>robots.txt</code> or <code>llms.txt</code> it didn’t create, so a hand-maintained
-            file is never clobbered.
-          </li>
-        </ul>
-        <div class="callout callout--warn">
-          <p>
+
+        <div class="card rules">
+          {
+            fixRules.map((r) => (
+              <div class="rule-item">
+                <Icon name="circle-check" size={15} color="var(--pass)" />
+                <span class="rule-copy">
+                  <span class="rule-title">{r.title}</span>
+                  <span class="rule-desc">{r.desc}</span>
+                </span>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="note">
+          <Icon name="triangle-alert" size={15} color="var(--accent)" />
+          <p class="note-text">
             Enabled static export and nothing happened? It won’t overwrite an existing
-            <code>robots.txt</code>/<code>llms.txt</code>. Remove or rename the existing file if you
+            <code>robots.txt</code> / <code>llms.txt</code>. Remove or rename the existing file if you
             want the plugin to manage it.
           </p>
         </div>
       </section>
 
-      <section id="mcp">
-        <h2>Agent (MCP) server</h2>
-        <p>
+      <!-- 06 MCP -->
+      <section class="sec" id="mcp">
+        <div class="eyebrow-row">
+          <span class="eyebrow">06 · Advanced</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Agent (MCP) server</h2>
+        <p class="sec-intro">
           Crawlwise ships an optional MCP server that exposes <code>scan</code>, <code>fix</code>,
-          <code>verify</code>, and <code>revert</code> as tools an AI agent can call directly. It is
-          <strong>off by default</strong> and requires a bearer token you generate yourself.
+          <code>verify</code> and <code>revert</code> as tools an AI agent can call directly. It is off
+          by default and requires a bearer token you generate yourself.
         </p>
-        <ol class="steps">
-          <li>
-            Go to <strong>Crawlwise → Settings</strong>, tick <strong>Enable the MCP server</strong>,
-            and click <strong>Save Changes</strong>.
-          </li>
-          <li>
-            Copy the bearer token shown. It is stored hashed and cannot be displayed again —
-            regenerate it if you lose it.
-          </li>
-          <li>Add it to your agent:</li>
-        </ol>
-        <pre><code># Register Crawlwise with your agent
-$ claude mcp add --transport http crawlwise \
-    https://your-site.com/wp-json/crawlwise/mcp \
-    --header "Authorization: Bearer &lt;token&gt;"
 
-✓ connected · tools: scan  fix  verify  revert</code></pre>
-        <div class="callout">
-          <p>
-            The token is stored as a SHA-256 hash, never included in a settings export, and can never
-            be set or enabled by a settings import.
-          </p>
+        <ol class="card steps">
+          {
+            mcpSteps.map((s, i) => (
+              <li class="step">
+                <span class="step-no">{i + 1}</span>
+                <span class="step-copy">
+                  <span class="step-title">{s.title}</span>
+                  <span class="step-desc">{s.desc}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="code-block">
+          <div class="code-bar">
+            <span class="mono code-title">Terminal</span>
+            <button class="copy-btn" type="button" data-copy>
+              <Icon name="copy" size={11} color="var(--muted)" />
+              <span class="mono copy-label">Copy</span>
+            </button>
+          </div>
+          <pre class="code-body"><code><span class="c-comment"># Register Crawlwise with your agent</span>
+<span class="c-cmd">$ claude mcp add --transport http crawlwise \
+    https://your-site.com/wp-json/crawlwise/mcp \
+    --header "Authorization: Bearer &lt;token&gt;"</span>
+<span class="c-ok">✓ connected · tools: scan, fix, verify, revert</span></code></pre>
+        </div>
+
+        <p class="sec-outro muted">
+          The token is stored as a SHA-256 hash, never in plain text, and is excluded from settings
+          exports.
+        </p>
+      </section>
+
+      <!-- 07 Privacy & security -->
+      <section class="sec" id="privacy">
+        <div class="eyebrow-row">
+          <span class="eyebrow">07 · Advanced</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Privacy &amp; security</h2>
+
+        <div class="ps-row">
+          <div class="card ps-card">
+            <div class="ps-bar"><span class="mono ps-title">Privacy</span></div>
+            <div class="ps-body">
+              <p class="ps-text">
+                Crawlwise makes HTTP requests to your own site only. It has no telemetry — nothing
+                is sent to us or any third party.
+              </p>
+              <p class="ps-text">
+                <code>/llms.txt</code>, the Markdown output and the JSON-LD graph only expose
+                already-public content: password-protected, private and draft content is never
+                included.
+              </p>
+            </div>
+          </div>
+
+          <div class="card ps-card" id="security">
+            <div class="ps-bar"><span class="mono ps-title">Security</span></div>
+            <div class="ps-body">
+              {
+                securityPoints.map((t) => (
+                  <div class="sec-item">
+                    <Icon name="shield-check" size={13} color="var(--pass)" />
+                    <span class="sec-text">{t}</span>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="privacy">
-        <h2>Privacy</h2>
-        <p>
-          Crawlwise makes HTTP requests to <strong>your own site only</strong>. It sends nothing to
-          any third party and has <strong>no telemetry</strong>.
-        </p>
-        <p>
-          <code>/llms.txt</code>, the Markdown output, and the JSON-LD graph are built exclusively
-          from public content: password-protected, private, draft, and per-entity excluded posts are
-          never included.
-        </p>
+      <!-- 08 FAQ -->
+      <section class="sec" id="faq">
+        <div class="eyebrow-row">
+          <span class="eyebrow">08 · Reference</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">FAQ</h2>
+
+        <div class="card faq-list">
+          {
+            faqs.map((f) => (
+              <details class="faq" open>
+                <summary class="q-row">
+                  <span class="question">{f.q}</span>
+                  <span class="chevron">
+                    <Icon name="chevron-down" size={14} color="var(--muted)" />
+                  </span>
+                </summary>
+                <p class="answer">{f.a}</p>
+              </details>
+            ))
+          }
+        </div>
       </section>
 
-      <section id="security">
-        <h2>Security</h2>
-        <ul class="bullets">
-          <li>
-            The MCP bearer token is stored as a SHA-256 hash. Its raw value is displayed exactly once,
-            when generated, and cannot be recovered — regenerate it if lost.
-          </li>
-          <li>
-            The token is never included in a settings export, and a settings import can never set or
-            enable it.
-          </li>
-          <li>
-            Failed MCP authentication attempts are rate-limited per IP, and cross-origin requests to
-            the MCP endpoint are rejected.
-          </li>
-          <li>
-            All dashboard REST routes require <code>manage_options</code>; per-entity routes require
-            <code>edit_post</code> for that specific post.
-          </li>
-        </ul>
+      <!-- Changelog -->
+      <section class="sec" id="changelog">
+        <div class="eyebrow-row">
+          <span class="eyebrow">09 · Reference</span>
+          <span class="rule"></span>
+        </div>
+        <h2 class="sec-title">Changelog</h2>
+        <p class="sec-intro">Every release, newest first.</p>
+
+        <div class="card rules">
+          <div class="rule-item">
+            <Icon name="circle-check" size={15} color="var(--pass)" />
+            <span class="rule-copy">
+              <span class="rule-title">0.1.0 — initial release</span>
+              <span class="rule-desc">
+                The scan → fix → verify loop across five dimensions. Password-protected content is
+                excluded from Markdown output, <code>/llms.txt</code> and JSON-LD descriptions. The
+                MCP bearer token is stored hashed, shown once, and excluded from settings export.
+                <code>*.md</code> and <code>.well-known/*</code> URLs return a real 404 when a feature
+                is off, and scan history is capped per scope.
+              </span>
+            </span>
+          </div>
+        </div>
       </section>
 
-      <section id="faq">
-        <h2>FAQ</h2>
-        {
-          faqs.map((f) => (
-            <>
-              <h3>{f.q}</h3>
-              <p>{f.a}</p>
-            </>
-          ))
-        }
-      </section>
+      <!-- Support -->
+      <div class="card support">
+        <div class="support-copy">
+          <Icon name="life-buoy" size={18} color="var(--accent)" />
+          <span class="support-text">
+            <span class="support-title">Still stuck?</span>
+            <span class="support-sub">
+              Open a thread on WordPress.org or reach us through wpaiscanner.com — we usually answer
+              within a day.
+            </span>
+          </span>
+        </div>
+        <div class="support-buttons">
+          <a class="btn btn--secondary btn--doc" href="https://wordpress.org/support/" rel="noopener">
+            Support forum
+          </a>
+          <a class="btn btn--primary btn--doc" href="/#get">Contact us</a>
+        </div>
+      </div>
 
-      <section id="changelog">
-        <h2>Changelog</h2>
-        <h3>0.1.0 <span class="mono dim-pts">— initial release</span></h3>
-        <ul class="bullets">
-          <li>Initial release of the scan → fix → verify loop across five dimensions.</li>
-          <li>
-            <strong>Security:</strong> password-protected content excluded from Markdown output,
-            <code>/llms.txt</code>, and JSON-LD descriptions.
-          </li>
-          <li>
-            <strong>Security:</strong> the MCP bearer token is stored hashed, shown once, excluded
-            from settings export, and cannot be set by settings import.
-          </li>
-          <li>
-            <strong>Security:</strong> MCP endpoint validates <code>Origin</code> and rate-limits
-            failed authentication.
-          </li>
-          <li>
-            <strong>Fixed:</strong> <code>*.md</code> and <code>.well-known/*</code> URLs return a real
-            404 instead of the front page when a feature is off.
-          </li>
-          <li>
-            <strong>Fixed:</strong> applying the C3 fix no longer rewrites post excerpts — the meta
-            description is derived at render time.
-          </li>
-          <li><strong>Fixed:</strong> scan history is capped per scope instead of growing without bound.</li>
-        </ul>
-      </section>
-    </article>
+      <div class="footnote">
+        <span>Docs for Crawlwise v0.1.0 · rubric-v1 — corrections welcome via the support forum.</span>
+        <span class="mono">wpaiscanner.com/docs</span>
+      </div>
+    </div>
   </div>
 </Base>
 
 <style>
-  .doc-head {
-    padding-block: 72px 40px;
+  /* The docs layout runs wider than the marketing pages: 100px gutters. */
+  .docwrap {
+    width: min(100% - 48px, 1240px);
+    margin-inline: auto;
   }
 
-  .doc-head .wrap {
+  /* ---------- hero ---------- */
+  .doc-hero {
+    border-bottom: 1px solid var(--border);
+    padding-block: 52px 40px;
+  }
+
+  .hero-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  .hero-copy {
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 14px;
+    max-width: 700px;
+  }
+
+  .hero-title {
+    font-size: clamp(26px, 2.6vw, 34px);
+    line-height: 1.14;
+    letter-spacing: -0.8px;
+  }
+
+  .hero-intro {
+    font-size: 13.5px;
+    line-height: 22px;
+    color: var(--body);
+  }
+
+  .hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 320px;
+    flex: none;
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    padding: 11px 14px;
+    cursor: text;
+  }
+
+  .search input {
+    flex: 1 1 0;
+    min-width: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+  }
+
+  .search input::placeholder {
+    color: var(--muted);
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface-2);
+    border-radius: 4px;
+    padding: 3px 7px;
+    flex: none;
+  }
+
+  .hero-meta {
+    font-size: 10px;
+  }
+
+  /* ---------- body ---------- */
+  .body-row {
+    display: flex;
     align-items: flex-start;
+    gap: 48px;
+    padding-block: 36px 64px;
   }
 
-  .measure {
-    max-width: 660px;
-  }
-
-  .doc-layout {
-    display: grid;
-    grid-template-columns: 230px 1fr;
-    gap: 60px;
-    align-items: start;
-    padding-bottom: 100px;
-  }
-
-  .toc {
+  .sidebar {
+    width: 220px;
+    flex: none;
     position: sticky;
     top: 92px;
     display: flex;
@@ -467,246 +727,759 @@ $ claude mcp add --transport http crawlwise \
     gap: 22px;
   }
 
-  .toc-group {
+  .side-group {
     display: flex;
     flex-direction: column;
+    gap: 4px;
+  }
+
+  .group-head {
+    padding: 0 10px 6px;
+  }
+
+  .group-label {
+    font-size: 10px;
+  }
+
+  .side-item {
+    display: flex;
+    align-items: center;
     gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .toc-group h2 {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    font-weight: 400;
-    letter-spacing: 1.2px;
-    color: var(--muted);
-    text-transform: uppercase;
+  .marker {
+    width: 3px;
+    height: 11px;
+    border-radius: 2px;
+    background: transparent;
+    flex: none;
   }
 
-  .toc a {
-    font-size: 13.5px;
-    color: var(--body);
-    padding: 4px 0;
-    transition: color 0.15s ease;
-  }
-
-  .toc a:hover {
-    color: var(--accent);
-  }
-
-  .doc {
-    min-width: 0;
-    max-width: 780px;
-  }
-
-  .doc section {
-    margin-bottom: 56px;
-    scroll-margin-top: 92px;
-  }
-
-  .doc h2 {
-    font-size: 28px;
-    letter-spacing: -0.6px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .doc h3 {
-    font-size: 18px;
-    letter-spacing: -0.3px;
-    margin-top: 32px;
-  }
-
-  .doc p {
-    margin-top: 16px;
-    font-size: 15.5px;
-    line-height: 26px;
+  .item-label {
+    flex: 1 1 0;
+    font-size: 12.5px;
+    font-weight: 500;
     color: var(--body);
   }
 
-  .doc strong {
+  .side-item:hover .item-label,
+  .side-item:focus-visible .item-label {
+    color: var(--ink);
+  }
+
+  .side-item:hover,
+  .side-item:focus-visible {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .side-item.is-active {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .side-item.is-active .marker {
+    background: var(--accent);
+  }
+
+  .side-item.is-active .item-label {
     color: var(--ink);
     font-weight: 600;
   }
 
+  .doc-content {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  /* ---------- section shell ---------- */
+  .sec {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-margin-top: 92px;
+  }
+
+  .sec-title {
+    font-size: 21px;
+    letter-spacing: -0.4px;
+  }
+
+  .sec-intro {
+    font-size: 13.5px;
+    line-height: 22px;
+    color: var(--body);
+    max-width: 760px;
+  }
+
+  .sec-outro {
+    font-size: 13px;
+    line-height: 21px;
+    color: var(--body);
+    max-width: 760px;
+  }
+
+  .sec-outro.muted {
+    color: var(--muted);
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow: hidden;
+  }
+
   code {
     font-family: var(--font-mono);
-    font-size: 0.86em;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 0.1em 0.4em;
+    font-size: 0.88em;
     color: var(--ink);
   }
 
-  .dim-pts {
-    color: var(--muted);
-    font-weight: 400;
-  }
-
-  .steps {
-    counter-reset: s;
-    margin-top: 18px;
+  /* ---------- steps ---------- */
+  .step {
     display: flex;
-    flex-direction: column;
     gap: 14px;
-  }
-
-  .steps li {
-    counter-increment: s;
-    position: relative;
-    padding-left: 42px;
-    font-size: 15.5px;
-    line-height: 25px;
-    color: var(--body);
-  }
-
-  .steps li::before {
-    content: counter(s);
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 500;
-    background: var(--accent-soft);
-    color: var(--accent);
-  }
-
-  .bullets {
-    margin-top: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .bullets li {
-    position: relative;
-    padding-left: 20px;
-    font-size: 15.5px;
-    line-height: 25px;
-    color: var(--body);
-  }
-
-  .bullets li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 10px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-
-  .callout {
-    margin-top: 20px;
-    padding: 16px 18px;
-    background: var(--surface);
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px var(--border);
-  }
-
-  .callout p {
-    margin: 0;
-    font-size: 14.5px;
-    line-height: 23px;
-  }
-
-  .callout--warn {
-    background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
-    box-shadow: inset 0 0 0 1px var(--accent-soft);
-  }
-
-  .table-wrap {
-    margin-top: 18px;
-    background: var(--surface);
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px var(--border);
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-
-  th,
-  td {
-    text-align: left;
-    padding: 11px 16px;
+    padding: 15px 18px;
     border-bottom: 1px solid var(--border);
   }
 
-  th {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-weight: 400;
-    background: var(--bg);
-  }
-
-  tr:last-child td {
+  .steps li:last-child {
     border-bottom: 0;
   }
 
-  .c-id {
-    font-family: var(--font-mono);
-    font-size: 12px;
+  .step-no {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
     color: var(--accent);
-    white-space: nowrap;
-    width: 1%;
-  }
-
-  .c-pts {
     font-family: var(--font-mono);
     font-size: 11.5px;
-    color: var(--muted);
-    white-space: nowrap;
-    text-align: right;
+    font-weight: 500;
   }
 
-  pre {
-    margin-top: 20px;
-    padding: 20px;
-    background: var(--surface-3);
-    border-radius: var(--radius);
-    box-shadow: inset 0 0 0 1px var(--border-strong);
-    overflow-x: auto;
-    font-family: var(--font-mono);
+  .step-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .step-desc {
     font-size: 12.5px;
     line-height: 20px;
     color: var(--body);
   }
 
-  pre code {
+  /* ---------- note ---------- */
+  .note {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--accent-soft) 30%, transparent);
+    box-shadow: inset 0 0 0 1px var(--accent-soft);
+  }
+
+  .note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .note-text {
+    flex: 1 1 0;
+    font-size: 12.5px;
+    line-height: 19px;
+    color: var(--body);
+  }
+
+  /* ---------- loop cards ---------- */
+  .loop-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .loop-card {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .loop-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .loop-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .loop-desc {
+    font-size: 12.5px;
+    line-height: 19px;
+    color: var(--body);
+  }
+
+  /* ---------- levels table ---------- */
+  .levels-head,
+  .level-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-inline: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .levels-head {
+    height: 36px;
+  }
+
+  .level-row {
+    padding-block: 11px;
+  }
+
+  .levels > .level-row:last-child {
+    border-bottom: 0;
+  }
+
+  .c-level {
+    width: 56px;
+    flex: none;
+  }
+
+  .c-name {
+    width: 170px;
+    flex: none;
+  }
+
+  .c-score {
+    width: 90px;
+    flex: none;
+  }
+
+  .c-meaning {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .levels-head span {
+    font-size: 10px;
+  }
+
+  .level-chip {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--pass);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+
+  .level-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .level-score {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink);
+  }
+
+  .level-meaning {
+    font-size: 12.5px;
+    color: var(--body);
+  }
+
+  /* ---------- dimensions ---------- */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .dim-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 36px;
+    padding-inline: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dim-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .dim-title,
+  .dim-pts,
+  .dim-flag {
+    font-size: 10.5px;
+  }
+
+  .dim-pts,
+  .dim-flag {
+    color: var(--accent);
+  }
+
+  .dim-body {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 10px 18px;
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .check-code {
+    width: 24px;
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .check-name {
+    flex: 1 1 0;
+    min-width: 0;
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--body);
+  }
+
+  .tier {
+    flex: none;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    background: var(--surface-2);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  .check-pts {
+    width: 44px;
+    flex: none;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  /* ---------- fix rules ---------- */
+  .rule-item {
+    display: flex;
+    gap: 12px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rules > .rule-item:last-child {
+    border-bottom: 0;
+  }
+
+  .rule-item :global(svg) {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .rule-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .rule-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .rule-desc {
+    font-size: 12.5px;
+    line-height: 20px;
+    color: var(--body);
+  }
+
+  /* ---------- code block ---------- */
+  .code-block {
+    background: var(--surface-3);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow: hidden;
+  }
+
+  .code-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-title,
+  .copy-label {
+    font-size: 9.5px;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     background: none;
     border: 0;
     padding: 0;
-    font-size: inherit;
+    cursor: pointer;
+    color: var(--muted);
   }
 
-  @media (max-width: 900px) {
-    .doc-layout {
-      grid-template-columns: 1fr;
-      gap: 32px;
-      padding-bottom: 68px;
+  .copy-btn:hover {
+    color: var(--accent);
+  }
+
+  .copy-btn:hover .copy-label {
+    color: var(--accent);
+  }
+
+  .code-body {
+    margin: 0;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 20px;
+  }
+
+  .c-comment {
+    color: var(--muted);
+  }
+
+  .c-cmd {
+    color: var(--ink);
+  }
+
+  .c-ok {
+    color: var(--pass);
+  }
+
+  /* ---------- privacy & security ---------- */
+  .ps-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .ps-bar {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding-inline: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ps-title {
+    font-size: 10.5px;
+  }
+
+  .ps-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+  }
+
+  .ps-text {
+    font-size: 12.5px;
+    line-height: 20px;
+    color: var(--body);
+  }
+
+  .sec-item {
+    display: flex;
+    gap: 9px;
+  }
+
+  .sec-item :global(svg) {
+    flex: none;
+    margin-top: 3px;
+  }
+
+  .sec-text {
+    flex: 1 1 0;
+    font-size: 12.5px;
+    line-height: 19px;
+    color: var(--body);
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-list > .faq:last-child {
+    border-bottom: 0;
+  }
+
+  .q-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .q-row::-webkit-details-marker {
+    display: none;
+  }
+
+  .question {
+    flex: 1 1 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .chevron {
+    display: grid;
+    place-items: center;
+    flex: none;
+    transition: transform 0.18s ease;
+  }
+
+  .faq[open] .chevron {
+    transform: rotate(180deg);
+  }
+
+  .answer {
+    padding: 0 18px 15px;
+    font-size: 12.5px;
+    line-height: 20px;
+    color: var(--body);
+  }
+
+  /* ---------- support ---------- */
+  .support {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 18px 20px;
+  }
+
+  .support-copy {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .support-copy :global(svg) {
+    flex: none;
+    margin-top: 1px;
+  }
+
+  .support-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .support-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .support-sub {
+    font-size: 12.5px;
+    line-height: 19px;
+    color: var(--body);
+  }
+
+  .support-buttons {
+    display: flex;
+    gap: 10px;
+    flex: none;
+  }
+
+  .btn--doc {
+    font-size: 13px;
+    padding: 9px 16px;
+  }
+
+  /* ---------- footnote ---------- */
+  .footnote {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-inline: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .footnote .mono {
+    font-size: 10.5px;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1080px) {
+    .hero-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 22px;
     }
 
-    .toc {
+    .hero-side {
+      width: 100%;
+    }
+
+    .body-row {
+      flex-direction: column;
+      /* Stretch, or the column children size to their content and overflow. */
+      align-items: stretch;
+      gap: 28px;
+    }
+
+    .sidebar {
       position: static;
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+    }
+
+    .side-group {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .group-head {
+      padding: 0 4px 0 0;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .loop-cards,
+    .dim-grid,
+    .ps-row {
+      grid-template-columns: 1fr;
+    }
+
+    .levels-head {
       display: none;
     }
 
-    .doc-head {
-      padding-block: 48px 28px;
+    .level-row {
+      flex-wrap: wrap;
+      gap: 6px 12px;
+    }
+
+    .c-name,
+    .c-score {
+      width: auto;
+    }
+
+    .c-meaning {
+      flex: 1 1 100%;
+    }
+
+    .support {
+      align-items: flex-start;
+    }
+
+    .support-buttons {
+      width: 100%;
+    }
+
+    .support-buttons .btn {
+      flex: 1 1 0;
+      justify-content: center;
     }
   }
 </style>
+
+<script>
+  // Highlight the sidebar entry for whichever section is in view.
+  const links = [...document.querySelectorAll('.side-item')];
+  const byId = new Map(links.map((a) => [a.getAttribute('href')?.slice(1), a]));
+  const sections = [...document.querySelectorAll('.sec[id]')].filter((s) => byId.has(s.id));
+
+  if (sections.length) {
+    const seen = new Set();
+    const setActive = (id) => {
+      links.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => (e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id)));
+        const first = sections.find((s) => seen.has(s.id));
+        if (first) setActive(first.id);
+      },
+      { rootMargin: '-92px 0px -70% 0px', threshold: 0 }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    setActive(sections[0].id);
+  }
+
+  // Copy the MCP registration snippet.
+  document.querySelector('[data-copy]')?.addEventListener('click', async (event) => {
+    const btn = event.currentTarget;
+    const code = btn.closest('.code-block')?.querySelector('code')?.innerText ?? '';
+    const label = btn.querySelector('.copy-label');
+    try {
+      await navigator.clipboard.writeText(code);
+      if (label) {
+        label.textContent = 'Copied';
+        setTimeout(() => (label.textContent = 'Copy'), 1600);
+      }
+    } catch {
+      /* clipboard blocked — leave the label alone */
+    }
+  });
+</script>
