@@ -1,15 +1,31 @@
-# Download button → private-repo release mirror
+# Release mirror → public GitHub download
 
-The "Download the plugin" button on the Crawlwise homepage points at:
+> **The site no longer links here.** The "Download the plugin" button on the
+> Crawlwise homepage now points at the WordPress.org listing:
+>
+> ```
+> https://wordpress.org/plugins/crawlwise-ai-readiness/
+> ```
+>
+> That URL lives in one place: `DOWNLOAD_URL` at the top of
+> `src/pages/index.astro`.
+>
+> Two consequences worth knowing:
+>
+> - The **download counter** in `data/` (see `data/README.md`) reads GitHub
+>   release assets, so it no longer reflects what the site's button drives.
+>   WordPress.org keeps its own stats on the plugin's page.
+> - The mirror below is still useful if you want a direct-zip download
+>   alongside the WordPress.org listing — otherwise it can be retired.
+
+The GitHub mirror keeps a public copy of the built ZIP at:
 
 ```
 https://github.com/zakariabinsaifullah/wpaiscanner/releases/latest/download/aiscaner.zip
 ```
 
 This is GitHub's **latest-release permalink**: it always resolves to the newest
-release's `aiscaner.zip` asset, so the site never needs editing when a
-new version ships. The URL lives in one place: `DOWNLOAD_URL` at the top of
-`src/pages/index.astro`.
+release's `aiscaner.zip` asset.
 
 The plugin source lives in the **private** `zakariabinsaifullah/aiscaner` repo.
 Release assets inherit repo visibility, so a private repo's asset can't be
