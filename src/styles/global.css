@@ -21,6 +21,7 @@
   --accent: #8f5400;
   --accent-ink: #fff8ec;
   --accent-soft: #efdcae;
+  --accent-hover: #7a4700;
 
   /* semantics */
   --pass: #12855a;
@@ -42,6 +43,66 @@
   --section-pt: 100px;
   --section-pb: 104px;
   --section-gap: 52px;
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------
+   Dark theme — palette transcribed from the dark design file.
+   Only the color tokens are redefined; every other rule reads
+   them, so the two themes share one set of layout rules.
+   Applied automatically by system preference, and overridable
+   in both directions via data-theme on <html>.
+   ------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0a0b0c;
+    --surface: #101214;
+    --surface-2: #16181b;
+    --surface-3: #0a0b0c;
+    --border: #23262a;
+    --border-strong: #343a41;
+
+    --ink: #edeff2;
+    --body: #99a1aa;
+    --muted: #6b737c;
+
+    --accent: #ffb224;
+    --accent-ink: #0a0b0c;
+    --accent-soft: #4a3a17;
+    --accent-hover: #ffc24d;
+
+    --pass: #3dd68c;
+    --fail: #f4614e;
+    --info: #6aa9ff;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0a0b0c;
+  --surface: #101214;
+  --surface-2: #16181b;
+  --surface-3: #0a0b0c;
+  --border: #23262a;
+  --border-strong: #343a41;
+
+  --ink: #edeff2;
+  --body: #99a1aa;
+  --muted: #6b737c;
+
+  --accent: #ffb224;
+  --accent-ink: #0a0b0c;
+  --accent-soft: #4a3a17;
+  --accent-hover: #ffc24d;
+
+  --pass: #3dd68c;
+  --fail: #f4614e;
+  --info: #6aa9ff;
+
+  color-scheme: dark;
 }
 
 *,
@@ -208,7 +269,7 @@ ol {
 }
 
 .btn--primary:hover {
-  background: #7a4700;
+  background: var(--accent-hover);
 }
 
 .btn--secondary {
