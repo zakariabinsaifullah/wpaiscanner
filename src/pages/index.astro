@@ -218,7 +218,7 @@ const jsonLd = {
         <div class="cta-row">
           <a class="btn btn--primary" href="#get">
             Scan my site
-            <Icon name="arrow-right" size={15} color="#FFF8EC" />
+            <Icon name="arrow-right" size={15} color="var(--accent-ink)" />
           </a>
           <a class="btn btn--secondary" href="#how-it-works">How it works</a>
         </div>
@@ -255,14 +255,14 @@ const jsonLd = {
           <div class="score">
             <div class="gauge" role="img" aria-label="Score 78 out of 100">
               <svg viewBox="0 0 150 150" width="150" height="150">
-                <circle cx="75" cy="75" r="71.25" fill="none" stroke="#F1EFEB" stroke-width="7.5"
+                <circle cx="75" cy="75" r="71.25" fill="none" stroke="var(--surface-2)" stroke-width="7.5"
                 ></circle>
                 <circle
                   cx="75"
                   cy="75"
                   r="71.25"
                   fill="none"
-                  stroke="#8F5400"
+                  stroke="var(--accent)"
                   stroke-width="7.5"
                   stroke-linecap="butt"
                   stroke-dasharray="349.2 447.7"
@@ -300,9 +300,9 @@ const jsonLd = {
               checkLog.map((c) => (
                 <div class="check">
                   <span class="check-icon">
-                    {c.state === 'pass' && <Icon name="check" size={12} color="#12855A" />}
-                    {c.state === 'fail' && <Icon name="x" size={12} color="#C33A26" />}
-                    {c.state === 'na' && <Icon name="minus" size={12} color="#71777E" />}
+                    {c.state === 'pass' && <Icon name="check" size={12} color="var(--pass)" />}
+                    {c.state === 'fail' && <Icon name="x" size={12} color="var(--fail)" />}
+                    {c.state === 'na' && <Icon name="minus" size={12} color="var(--muted)" />}
                   </span>
                   <span class="check-code">{c.code}</span>
                   <span class="check-name">{c.name}</span>
@@ -377,15 +377,15 @@ const jsonLd = {
 
       <div class="loop-rail">
         <span class="mono rail-step on">Scan</span>
-        <Icon name="arrow-right" size={13} color="#71777E" />
+        <Icon name="arrow-right" size={13} color="var(--muted)" />
         <span class="mono rail-step on">Fix</span>
-        <Icon name="arrow-right" size={13} color="#71777E" />
+        <Icon name="arrow-right" size={13} color="var(--muted)" />
         <span class="mono rail-step on">Verify</span>
-        <Icon name="arrow-right" size={13} color="#71777E" />
+        <Icon name="arrow-right" size={13} color="var(--muted)" />
         <span class="mono rail-step">Re-scan</span>
         <span class="rail-spacer"></span>
         <span class="rail-meta">
-          <Icon name="repeat" size={13} color="#71777E" />
+          <Icon name="repeat" size={13} color="var(--muted)" />
           <span class="mono">Scheduled · weekly</span>
         </span>
       </div>
@@ -395,7 +395,7 @@ const jsonLd = {
           steps.map((s) => (
             <article class="step">
               <div class="step-head">
-                <Icon name={s.icon} size={15} color="#8F5400" />
+                <Icon name={s.icon} size={15} color="var(--accent)" />
                 <span class="mono">{s.num}</span>
               </div>
               <h3 class="step-title">{s.title}</h3>
@@ -591,7 +591,7 @@ const jsonLd = {
             {
               mcpBullets.map((b) => (
                 <div class="bullet">
-                  <Icon name={b.icon} size={15} color="#8F5400" />
+                  <Icon name={b.icon} size={15} color="var(--accent)" />
                   <span class="bullet-text">
                     <span class="bullet-title">{b.title}</span>
                     <span class="bullet-desc">{b.desc}</span>
@@ -636,7 +636,7 @@ const jsonLd = {
       </p>
       <div class="cta-buttons">
         <a class="btn btn--primary btn--lg" href={DOWNLOAD_URL}>
-          <Icon name="download" size={15} color="#FFF8EC" />
+          <Icon name="download" size={15} color="var(--accent-ink)" />
           Download the plugin
         </a>
         <a class="btn btn--secondary btn--lg" href="/docs/">Read the docs</a>
