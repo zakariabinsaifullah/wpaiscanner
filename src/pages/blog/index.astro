@@ -109,7 +109,8 @@ const jsonLd = {
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    /* min() keeps the track from exceeding the column on narrow phones. */
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 22px;
   }
 

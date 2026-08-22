@@ -206,9 +206,9 @@ const jsonLd = {
       </div>
 
       <div class="headline-block">
-        <h1 class="hero-h1">
-          See your site the way<br />an <span class="accent">agent</span> does.
-        </h1>
+        <h1 class="hero-h1"><span class="hl">See your site the way</span> <span class="hl"
+            >an <span class="accent">agent</span> does.</span
+          ></h1>
 
         <p class="lead hero-lead">
           Crawlwise grades your WordPress site over a real HTTP request, applies one-click fixes
@@ -238,10 +238,16 @@ const jsonLd = {
       <!-- Instrument panel -->
       <div class="panel instrument">
         <div class="panel-bar">
-          <span class="mono">Agent-readiness · rubric v1</span>
+          <span class="mono"
+            >Agent-readiness · <span class="hide-sm">rubric </span>v1</span
+          >
           <span class="status">
             <span class="status-dot"></span>
-            <span class="mono status-label">Live · GET / → 200 · 412 ms</span>
+            <span class="mono status-label"
+              ><span class="hide-sm">Live · </span>GET / → 200<span class="hide-sm">
+                · 412 ms</span
+              ></span
+            >
           </span>
         </div>
 
@@ -378,8 +384,10 @@ const jsonLd = {
         <Icon name="arrow-right" size={13} color="#71777E" />
         <span class="mono rail-step">Re-scan</span>
         <span class="rail-spacer"></span>
-        <Icon name="repeat" size={13} color="#71777E" />
-        <span class="mono">Scheduled · weekly</span>
+        <span class="rail-meta">
+          <Icon name="repeat" size={13} color="#71777E" />
+          <span class="mono">Scheduled · weekly</span>
+        </span>
       </div>
 
       <div class="steps">
@@ -661,6 +669,11 @@ const jsonLd = {
     font-size: clamp(38px, 5.28vw, 76px);
     line-height: 1.04;
     letter-spacing: -2.6px;
+  }
+
+  /* Two fixed lines on desktop; the phone rule below lets them reflow. */
+  .hero-h1 .hl {
+    display: block;
   }
 
   .accent {
@@ -953,6 +966,13 @@ const jsonLd = {
   .rail-spacer {
     flex: 1 1 0;
     min-width: 8px;
+  }
+
+  .rail-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
   }
 
   /* steps */
@@ -1540,6 +1560,71 @@ const jsonLd = {
 
     .dim-desc {
       display: none;
+    }
+  }
+
+  /* ---------- phone: per the mobile designs ---------- */
+  @media (max-width: 640px) {
+    /* Headline breaks naturally over three lines instead of at the desktop break. */
+    .hero-h1 {
+      font-size: 40px;
+      line-height: 1.08;
+      letter-spacing: -1.4px;
+    }
+
+    .hero-h1 .hl {
+      display: inline;
+    }
+
+    .headline-block {
+      gap: 22px;
+    }
+
+    /* Full-width, stacked buttons. */
+    .cta-row,
+    .cta-buttons {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .cta-row .btn,
+    .cta-buttons .btn {
+      width: 100%;
+      justify-content: center;
+      padding-block: 15px;
+    }
+
+    /* Trust signals in a two-up grid. */
+    .trust-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 14px;
+      width: 100%;
+    }
+
+    /* Abbreviated panel labels. */
+    .hide-sm {
+      display: none;
+    }
+
+    /* Loop rail keeps only the four beats, centred. */
+    .loop-rail {
+      justify-content: center;
+      gap: 10px;
+      padding-inline: 14px;
+    }
+
+    .rail-spacer,
+    .rail-meta {
+      display: none;
+    }
+
+    /* Every step is divided, including the first. */
+    .step:first-child {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
     }
   }
 
