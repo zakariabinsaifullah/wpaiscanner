@@ -4,8 +4,7 @@ import Icon from '../components/Icon.astro';
 
 const SITE = Astro.site.href.replace(/\/$/, '');
 
-const DOWNLOAD_URL =
-  'https://github.com/zakariabinsaifullah/wpaiscanner/releases/latest/download/aiscaner.zip';
+const DOWNLOAD_URL = 'https://wordpress.org/plugins/crawlwise-ai-readiness/';
 
 const dimensions = [
   { label: 'Discoverability', value: 92, pct: 92 },
@@ -16,7 +15,7 @@ const dimensions = [
 ];
 
 const checkLog = [
-  { code: 'D1', name: 'robots.txt present', pts: '6', state: 'pass' },
+  { code: 'D1', name: 'robots.txt present', pts: '4', state: 'pass' },
   { code: 'D2', name: 'XML sitemap', pts: '4', state: 'pass' },
   { code: 'D3', name: 'Link header', pts: '0', state: 'fail' },
   { code: 'C1', name: 'Markdown negotiation', pts: '0', state: 'fail' },
@@ -59,9 +58,9 @@ const rubric = [
   {
     name: 'Discoverability',
     desc: 'Can an agent find your content and its structure at all?',
-    total: '13 pts',
+    total: '11 pts',
     checks: [
-      { id: 'D1', check: 'robots.txt present & sane', pts: '6' },
+      { id: 'D1', check: 'robots.txt present & sane', pts: '4' },
       { id: 'D2', check: 'XML sitemap', pts: '4' },
       { id: 'D3', check: 'Link header for discovery', pts: '3' },
     ],
@@ -111,13 +110,13 @@ const rubric = [
 const levels = [
   { num: '0', name: 'Invisible', desc: 'Agents can’t reliably find or read the site.', range: '0–9' },
   { num: '1', name: 'Discoverable', desc: 'Basic robots & sitemap signals are in place.', range: '10–29' },
-  { num: '2', name: 'Readable', desc: 'Content is available in machine-friendly form.', range: '30–49' },
-  { num: '3', name: 'Governed', desc: 'You state explicitly which bots may do what.', range: '50–69' },
+  { num: '2', name: 'Readable', desc: 'Content is available in machine-friendly form.', range: '30–54' },
+  { num: '3', name: 'Governed', desc: 'You state explicitly which bots may do what.', range: '55–74' },
   {
     num: '4',
     name: 'Interactive',
     desc: 'Capabilities & APIs are discoverable by agents.',
-    range: '70–89',
+    range: '75–89',
     here: true,
   },
   { num: '5', name: 'Agent-Native', desc: 'Fully legible and actionable — the top of the rubric.', range: '90–100' },
@@ -185,7 +184,7 @@ const jsonLd = {
       softwareVersion: '0.1.0',
       license: 'https://www.gnu.org/licenses/gpl-2.0.html',
       image: `${SITE}/og-image.png`,
-      downloadUrl: DOWNLOAD_URL,
+      installUrl: DOWNLOAD_URL,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
   ],
@@ -456,7 +455,7 @@ const jsonLd = {
         <div class="total-row">
           <span class="mono total-label">Total</span>
           <span class="total-note">15 checks across 5 dimensions · points earned ÷ points possible</span>
-          <span class="total-sum">68</span>
+          <span class="total-sum">66</span>
         </div>
       </div>
 
@@ -503,20 +502,20 @@ const jsonLd = {
           </div>
         </div>
         <div class="segments">
-          <span class="seg soft" style="flex:113"></span>
-          <span class="seg soft" style="flex:227"></span>
-          <span class="seg soft" style="flex:227"></span>
-          <span class="seg soft" style="flex:227"></span>
-          <span class="seg" style="flex:227"><span class="seg-fill" style="width:40%"></span></span>
-          <span class="seg" style="flex:124"></span>
+          <span class="seg soft" style="flex:10"></span>
+          <span class="seg soft" style="flex:20"></span>
+          <span class="seg soft" style="flex:25"></span>
+          <span class="seg soft" style="flex:20"></span>
+          <span class="seg" style="flex:15"><span class="seg-fill" style="width:20%"></span></span>
+          <span class="seg" style="flex:11"></span>
         </div>
         <div class="ticks">
-          <span class="mono" style="flex:113">0–9</span>
-          <span class="mono" style="flex:227">10–29</span>
-          <span class="mono" style="flex:227">30–49</span>
-          <span class="mono" style="flex:227">50–69</span>
-          <span class="mono tick-on" style="flex:227">70–89</span>
-          <span class="mono" style="flex:124">90–100</span>
+          <span class="mono" style="flex:10">0–9</span>
+          <span class="mono" style="flex:20">10–29</span>
+          <span class="mono" style="flex:25">30–54</span>
+          <span class="mono" style="flex:20">55–74</span>
+          <span class="mono tick-on" style="flex:15">75–89</span>
+          <span class="mono" style="flex:11">90–100</span>
         </div>
       </div>
 
@@ -1187,7 +1186,7 @@ const jsonLd = {
 
   .you {
     position: absolute;
-    left: 71.3%;
+    left: 77.3%;
     top: 0;
     display: flex;
     flex-direction: column;
