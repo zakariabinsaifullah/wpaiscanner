@@ -28,8 +28,52 @@ const ogImage = new URL(image, Astro.site).href;
       content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
     <meta name="author" content="Crawlwise" />
-    <meta name="theme-color" content="#FAF9F7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0A0B0C" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0A0B0C" />
+
+    <!--
+      Theme handling, inline and classic on purpose:
+        1. Applies the stored choice before first paint, so a light-mode
+           visitor never flashes the dark default. Dark needs no attribute —
+           it is the stylesheet's base.
+        2. Binds the toggle by delegation, so it works from parse time.
+           A deferred/module script would be blocked behind the font
+           stylesheet and leave the button dead until fonts finish.
+    -->
+    <script is:inline>
+      (function () {
+        var KEY = 'cw-theme';
+        var BAR = { dark: '#0A0B0C', light: '#FAF9F7' };
+        var root = document.documentElement;
+
+        function paint(theme) {
+          if (theme === 'light') root.setAttribute('data-theme', 'light');
+          else root.removeAttribute('data-theme');
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', BAR[theme] || BAR.dark);
+        }
+
+        try {
+          var saved = localStorage.getItem(KEY);
+          if (saved === 'light' || saved === 'dark') paint(saved);
+        } catch (e) {
+          /* storage unavailable — keep the dark default */
+        }
+
+        document.addEventListener('click', function (event) {
+          var target = event.target;
+          if (!target || !target.closest || !target.closest('#theme-toggle')) return;
+
+          var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          paint(next);
+          try {
+            localStorage.setItem(KEY, next);
+          } catch (e) {
+            /* private mode — the choice just won't persist */
+          }
+        });
+      })();
+    </script>
+
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 
     <link
