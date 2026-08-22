@@ -1,21 +1,26 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
-import { getCollection, render } from 'astro:content';
+import { getPosts } from '../../lib/wp.js';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
 
 const fmt = (d) =>
-  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
 
 const SITE = Astro.site.href.replace(/\/$/, '');
-const url = `${SITE}/blog/${post.id}/`;
+const url = `${SITE}/blog/${post.slug}/`;
+const ogImage = post.image?.src ?? `${SITE}/og-image.png`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -23,13 +28,15 @@ const jsonLd = {
     {
       '@type': 'BlogPosting',
       '@id': `${url}#post`,
-      headline: post.data.title,
-      description: post.data.description,
+      headline: post.title,
+      description: post.description,
       url,
-      datePublished: post.data.pubDate.toISOString().slice(0, 10),
-      dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString().slice(0, 10),
+      datePublished: post.pubDate.toISOString().slice(0, 10),
+      dateModified: (post.updatedDate ?? post.pubDate).toISOString().slice(0, 10),
       inLanguage: 'en',
-      image: `${SITE}/og-image.png`,
+      image: ogImage,
+      articleSection: post.category,
+      ...(post.tags.length ? { keywords: post.tags.join(', ') } : {}),
       author: { '@type': 'Organization', name: 'Crawlwise', url: `${SITE}/` },
       publisher: { '@type': 'Organization', name: 'Crawlwise', url: `${SITE}/` },
       mainEntityOfPage: { '@type': 'WebPage', '@id': url },
@@ -39,7 +46,7 @@ const jsonLd = {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
         { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
-        { '@type': 'ListItem', position: 3, name: post.data.title, item: url },
+        { '@type': 'ListItem', position: 3, name: post.title, item: url },
       ],
     },
   ],
@@ -47,25 +54,41 @@ const jsonLd = {
 ---
 
 <Base
-  title={`${post.data.title} — Crawlwise Blog`}
-  description={post.data.description}
+  title={`${post.title} — Crawlwise Blog`}
+  description={post.description}
   ogType="article"
+  image={ogImage}
   jsonLd={jsonLd}
 >
   <article class="post">
     <div class="wrap post-head">
       <a class="back mono" href="/blog/">← All posts</a>
-      <span class="tag">{post.data.category}</span>
-      <h1 class="post-title">{post.data.title}</h1>
+      <span class="tag">{post.category}</span>
+      <h1 class="post-title">{post.title}</h1>
       <div class="post-meta mono">
-        <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
-        <span>·</span><span>{post.data.readingTime}</span>
+        <time datetime={post.pubDate.toISOString()}>{fmt(post.pubDate)}</time>
+        <span>·</span><span>{post.readingTime}</span>
         <span>·</span><span>By the Crawlwise team</span>
       </div>
     </div>
 
+    {
+      post.image && (
+        <div class="wrap">
+          <img
+            class="hero"
+            src={post.image.src}
+            alt={post.image.alt}
+            width={post.image.width}
+            height={post.image.height}
+            decoding="async"
+          />
+        </div>
+      )
+    }
+
     <div class="wrap prose">
-      <Content />
+      <Fragment set:html={post.content} />
     </div>
 
     <div class="wrap post-foot">
@@ -131,10 +154,25 @@ const jsonLd = {
 
   .prose {
     max-width: 760px;
+    /* Breathing room under the meta rule (or the hero) before the body copy. */
+    padding-top: 34px;
+  }
+
+  .hero {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-top: 32px;
+    background: var(--surface-2);
   }
 
   .post-foot {
     max-width: 760px;
+    clear: both;
     display: flex;
     justify-content: space-between;
     gap: 16px;
@@ -156,7 +194,11 @@ const jsonLd = {
     gap: 7px;
   }
 
-  /* markdown output */
+  /* WordPress block output */
+  .prose :global(> :first-child) {
+    margin-top: 0;
+  }
+
   .prose :global(h2) {
     font-size: 26px;
     letter-spacing: -0.5px;
@@ -167,6 +209,11 @@ const jsonLd = {
     font-size: 19px;
     letter-spacing: -0.3px;
     margin-top: 30px;
+  }
+
+  .prose :global(h4) {
+    font-size: 16.5px;
+    margin-top: 26px;
   }
 
   .prose :global(p) {
@@ -249,9 +296,184 @@ const jsonLd = {
     font-size: inherit;
   }
 
+  /*
+    The editor's Code block, dressed to match the panelled snippets on the
+    docs page: a labelled bar over a scrollable body. The bar is a pseudo
+    element, so the scroll lives on the <code> — a scrolling <pre> would
+    slide the bar out of view along with the code.
+  */
+  .prose :global(.wp-block-code) {
+    position: relative;
+    margin-top: 26px;
+    padding: 32px 0 0;
+    /* surface-2 rather than surface-3: in dark mode surface-3 is the page
+       colour, which would leave the panel floating on a hairline border. */
+    background: var(--surface-2);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px var(--border);
+    overflow: hidden;
+  }
+
+  .prose :global(.wp-block-code)::before {
+    content: 'Code';
+    position: absolute;
+    inset: 0 0 auto 0;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .prose :global(.wp-block-code code) {
+    display: block;
+    padding: 14px 16px;
+    overflow-x: auto;
+    /* Shell snippets break on backslashes; wrapping them would mislead. */
+    white-space: pre;
+    tab-size: 2;
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--ink);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  .prose :global(.wp-block-code code)::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .prose :global(.wp-block-code code)::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 4px;
+  }
+
+  .prose :global(.wp-block-preformatted) {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /*
+    Blocks that only appear in WordPress-authored content. The editor emits
+    its own class names (wp-block-*) with no stylesheet attached here, so
+    each block that needs shape gets it explicitly.
+  */
+  .prose :global(figure),
+  .prose :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .prose :global(figure) {
+    margin-top: 30px;
+  }
+
+  .prose :global(figure img) {
+    display: block;
+    border-radius: 8px;
+  }
+
+  .prose :global(figcaption) {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .prose :global(.wp-block-image.alignleft),
+  .prose :global(.wp-block-image.alignright) {
+    max-width: 340px;
+  }
+
+  .prose :global(.alignleft) {
+    float: left;
+    margin: 30px 26px 8px 0;
+  }
+
+  .prose :global(.alignright) {
+    float: right;
+    margin: 30px 0 8px 26px;
+  }
+
+  .prose :global(.aligncenter) {
+    margin-inline: auto;
+  }
+
+  .prose :global(.wp-block-table) {
+    margin-top: 26px;
+    overflow-x: auto;
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    border: 1px solid var(--border);
+    padding: 9px 12px;
+    text-align: left;
+    line-height: 22px;
+  }
+
+  .prose :global(th) {
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .prose :global(hr) {
+    margin: 40px 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .prose :global(.wp-block-embed) {
+    margin-top: 30px;
+  }
+
+  .prose :global(iframe) {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .prose :global(.wp-block-button__link) {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .prose :global(.screen-reader-text) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   @media (max-width: 860px) {
     .post {
       padding-block: 40px 68px;
+    }
+
+    .prose {
+      padding-top: 24px;
     }
   }
 </style>
