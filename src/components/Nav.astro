@@ -178,15 +178,15 @@ const links = [
   }
 
   /* Show the icon for the theme you'd switch *to*. */
-  .ico-moon {
+  .ico-sun {
     display: none;
   }
 
-  :global(html[data-theme='light']) .ico-sun {
+  :global(html[data-theme='dark']) .ico-moon {
     display: none;
   }
 
-  :global(html[data-theme='light']) .ico-moon {
+  :global(html[data-theme='dark']) .ico-sun {
     display: block;
   }
 
