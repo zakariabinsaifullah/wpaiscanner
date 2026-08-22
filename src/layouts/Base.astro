@@ -28,12 +28,12 @@ const ogImage = new URL(image, Astro.site).href;
       content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
     <meta name="author" content="Crawlwise" />
-    <meta name="theme-color" content="#0A0B0C" />
+    <meta name="theme-color" content="#FAF9F7" />
 
     <!--
       Theme handling, inline and classic on purpose:
-        1. Applies the stored choice before first paint, so a light-mode
-           visitor never flashes the dark default. Dark needs no attribute —
+        1. Applies the stored choice before first paint, so a dark-mode
+           visitor never flashes the light default. Light needs no attribute —
            it is the stylesheet's base.
         2. Binds the toggle by delegation, so it works from parse time.
            A deferred/module script would be blocked behind the font
@@ -46,24 +46,24 @@ const ogImage = new URL(image, Astro.site).href;
         var root = document.documentElement;
 
         function paint(theme) {
-          if (theme === 'light') root.setAttribute('data-theme', 'light');
+          if (theme === 'dark') root.setAttribute('data-theme', 'dark');
           else root.removeAttribute('data-theme');
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', BAR[theme] || BAR.dark);
+          if (meta) meta.setAttribute('content', BAR[theme] || BAR.light);
         }
 
         try {
           var saved = localStorage.getItem(KEY);
           if (saved === 'light' || saved === 'dark') paint(saved);
         } catch (e) {
-          /* storage unavailable — keep the dark default */
+          /* storage unavailable — keep the light default */
         }
 
         document.addEventListener('click', function (event) {
           var target = event.target;
           if (!target || !target.closest || !target.closest('#theme-toggle')) return;
 
-          var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
           paint(next);
           try {
             localStorage.setItem(KEY, next);

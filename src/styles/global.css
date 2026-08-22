@@ -4,37 +4,37 @@
    ============================================================ */
 
 /* ------------------------------------------------------------
-   Dark is the default theme, so its tokens live on bare :root.
-   Light is an explicit opt-in via data-theme="light", set by the
+   Light is the default theme, so its tokens live on bare :root.
+   Dark is an explicit opt-in via data-theme="dark", set by the
    toggle and persisted in localStorage. System preference is
-   deliberately not consulted: the site ships dark for everyone
+   deliberately not consulted: the site ships light for everyone
    until a visitor chooses otherwise.
    ------------------------------------------------------------ */
 
 :root {
   /* surfaces */
-  --bg: #0a0b0c;
-  --surface: #101214;
-  --surface-2: #16181b;
-  --surface-3: #0a0b0c;
-  --border: #23262a;
-  --border-strong: #343a41;
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f1efeb;
+  --surface-3: #efede8;
+  --border: #e4e1db;
+  --border-strong: #c6c2b9;
 
   /* text */
-  --ink: #edeff2;
-  --body: #99a1aa;
-  --muted: #6b737c;
+  --ink: #14161a;
+  --body: #585e66;
+  --muted: #71777e;
 
   /* brand */
-  --accent: #ffb224;
-  --accent-ink: #0a0b0c;
-  --accent-soft: #4a3a17;
-  --accent-hover: #ffc24d;
+  --accent: #8f5400;
+  --accent-ink: #fff8ec;
+  --accent-soft: #efdcae;
+  --accent-hover: #7a4700;
 
   /* semantics */
-  --pass: #3dd68c;
-  --fail: #f4614e;
-  --info: #6aa9ff;
+  --pass: #12855a;
+  --fail: #c33a26;
+  --info: #2160c4;
 
   /* type */
   --font-display: Archivo, system-ui, sans-serif;
@@ -52,32 +52,32 @@
   --section-pb: 104px;
   --section-gap: 52px;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-/* Light theme — palette from the original light design file. */
-:root[data-theme='light'] {
-  --bg: #faf9f7;
-  --surface: #ffffff;
-  --surface-2: #f1efeb;
-  --surface-3: #efede8;
-  --border: #e4e1db;
-  --border-strong: #c6c2b9;
+/* Dark theme — palette from the dark design file. */
+:root[data-theme='dark'] {
+  --bg: #0a0b0c;
+  --surface: #101214;
+  --surface-2: #16181b;
+  --surface-3: #0a0b0c;
+  --border: #23262a;
+  --border-strong: #343a41;
 
-  --ink: #14161a;
-  --body: #585e66;
-  --muted: #71777e;
+  --ink: #edeff2;
+  --body: #99a1aa;
+  --muted: #6b737c;
 
-  --accent: #8f5400;
-  --accent-ink: #fff8ec;
-  --accent-soft: #efdcae;
-  --accent-hover: #7a4700;
+  --accent: #ffb224;
+  --accent-ink: #0a0b0c;
+  --accent-soft: #4a3a17;
+  --accent-hover: #ffc24d;
 
-  --pass: #12855a;
-  --fail: #c33a26;
-  --info: #2160c4;
+  --pass: #3dd68c;
+  --fail: #f4614e;
+  --info: #6aa9ff;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
