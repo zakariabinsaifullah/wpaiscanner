@@ -1,8 +1,30 @@
 {
   "repo": "zakariabinsaifullah/wpaiscanner",
-  "checked_on": "2026-08-22",
+  "checked_on": "2026-08-23",
   "total": 26,
   "releases": [
+    {
+      "tag": "v0.2.0",
+      "published_at": "2026-08-22T11:49:28Z",
+      "downloads": 0,
+      "assets": [
+        {
+          "name": "crawlwise-ai-readiness.zip",
+          "downloads": 0
+        }
+      ]
+    },
+    {
+      "tag": "v0.1.0",
+      "published_at": "2026-08-22T11:26:03Z",
+      "downloads": 0,
+      "assets": [
+        {
+          "name": "crawlwise-ai-readiness.zip",
+          "downloads": 0
+        }
+      ]
+    },
     {
       "tag": "0.2.0",
       "published_at": "2026-08-17T05:37:45Z",
@@ -22,6 +44,10 @@
         {
           "name": "aiscaner.zip",
           "downloads": 26
+        },
+        {
+          "name": "crawlwise-ai-readiness.zip",
+          "downloads": 0
         }
       ]
     }
